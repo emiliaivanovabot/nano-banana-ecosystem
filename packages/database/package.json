@@ -1,0 +1,23 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "dev": "echo 'Database package'",
+    "build": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
+    "migrate": "node -e \"const { runMigrations } = require('./migrations.ts'); runMigrations().catch(console.error);\"",
+    "health-check": "node -e \"const { healthCheck } = require('./migrations.ts'); healthCheck().then(console.log).catch(console.error);\"",
+    "validate-env": "node -e \"const { validateEnvironment } = require('./migrations.ts'); console.log('Environment valid:', validateEnvironment());\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.84.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "typescript": "5.9.2"
+  }
+}

@@ -4,6 +4,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:all": "turbo run dev --parallel",
+    "dev:core": "turbo run dev --filter='platform' --filter='seedream' --parallel",
+    "dev:minimal": "turbo run dev --filter='platform'",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
