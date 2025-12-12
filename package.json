@@ -1,8 +1,14 @@
 {
   "name": "nano-banana-ecosystem",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
+    "build:platform": "turbo run build --filter=platform",
+    "build:seedream": "turbo run build --filter=seedream",
     "dev": "turbo run dev",
     "dev:all": "turbo run dev --parallel",
     "dev:core": "turbo run dev --filter='platform' --filter='seedream' --parallel",
@@ -16,8 +22,9 @@
     "turbo": "^2.6.3",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "npm@10.9.3",
   "engines": {
-    "node": ">=18"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }

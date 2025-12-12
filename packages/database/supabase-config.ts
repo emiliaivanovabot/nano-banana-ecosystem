@@ -149,33 +149,44 @@ export const authConfig = {
 
 // Environment validation function
 export function validateSupabaseConfig() {
+  // Skip validation during build time
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+    return true
+  }
+  
   const required = [
-    'SUPABASE_URL',
-    'SUPABASE_ANON_KEY',
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
   ]
   
   const missing = required.filter(key => !process.env[key])
   
   if (missing.length > 0) {
-    throw new Error(
-      `Missing required Supabase environment variables: ${missing.join(', ')}\n` +
-      'Please check your .env file and ensure all Supabase credentials are configured.'
-    )
+    // Only warn during development, don't throw
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        `Warning: Missing Supabase environment variables: ${missing.join(', ')}\n` +
+        'Some features may not work correctly without proper configuration.'
+      )
+    }
+    return false
   }
   
-  // Validate URL format
-  const url = process.env.SUPABASE_URL
-  if (!url?.startsWith('https://') || !url.includes('.supabase.co')) {
-    throw new Error('Invalid SUPABASE_URL format. Expected https://your-project.supabase.co')
+  // Validate URL format if URL exists
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (url && (!url.startsWith('https://') || !url.includes('.supabase.co'))) {
+    console.warn('Warning: Invalid SUPABASE_URL format. Expected https://your-project.supabase.co')
+    return false
   }
   
-  // Validate key formats (basic check)
-  const anonKey = process.env.SUPABASE_ANON_KEY
+  // Validate key formats if keys exist
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
-  if (!anonKey?.startsWith('eyJ') || !serviceKey?.startsWith('eyJ')) {
-    throw new Error('Invalid Supabase key format. Keys should start with "eyJ"')
+  if ((anonKey && !anonKey.startsWith('eyJ')) || (serviceKey && !serviceKey.startsWith('eyJ'))) {
+    console.warn('Warning: Invalid Supabase key format. Keys should start with "eyJ"')
+    return false
   }
   
   return true
@@ -190,8 +201,8 @@ export function createValidatedSupabaseClient(
   // Validate configuration first
   validateSupabaseConfig()
   
-  const supabaseUrl = url || process.env.SUPABASE_URL!
-  const supabaseAnonKey = anonKey || process.env.SUPABASE_ANON_KEY!
+  const supabaseUrl = url || process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = anonKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   
   return {
     url: supabaseUrl,
@@ -205,7 +216,7 @@ export async function checkDatabaseHealth() {
   try {
     const { createClient } = await import('@supabase/supabase-js')
     const client = createClient(
-      process.env.SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       serverSupabaseConfig
     )

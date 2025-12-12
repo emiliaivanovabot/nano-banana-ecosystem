@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "name": "platform",
+  "buildCommand": "cd ../.. && npm run build --filter=platform",
+  "devCommand": "cd ../.. && npm run dev --filter=platform",
+  "installCommand": "cd ../.. && npm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

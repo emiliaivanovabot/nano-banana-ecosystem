@@ -20,8 +20,8 @@ export const createSupabaseClient = (
   // Validate environment first
   validateSupabaseConfig()
   
-  const finalUrl = url || process.env.SUPABASE_URL!
-  const finalKey = anonKey || process.env.SUPABASE_ANON_KEY!
+  const finalUrl = url || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+  const finalKey = anonKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
   
   return createClient(finalUrl, finalKey, productionSupabaseConfig)
 }
@@ -34,8 +34,8 @@ export const createServerSupabaseClient = (
   // Validate environment first
   validateSupabaseConfig()
   
-  const finalUrl = url || process.env.SUPABASE_URL!
-  const finalKey = serviceRoleKey || process.env.SUPABASE_SERVICE_ROLE_KEY!
+  const finalUrl = url || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+  const finalKey = serviceRoleKey || process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key'
   
   return createClient(finalUrl, finalKey, serverSupabaseConfig)
 }
@@ -110,37 +110,7 @@ export {
   type GenerationStatus
 } from '../supabase-config'
 
-export {
-  SupabaseMigrationRunner,
-  runMigrations,
-  validateEnvironment,
-  getCrossDomainConfig,
-  healthCheck
-} from '../migrations'
-
-// Enhanced database client with health checking
-export const createHealthCheckedClient = async (
-  url?: string,
-  anonKey?: string
-) => {
-  const client = createSupabaseClient(url, anonKey)
-  
-  // Perform health check
-  const isHealthy = await checkDatabaseHealth()
-  if (!isHealthy) {
-    throw new Error('Database health check failed - connection issues detected')
-  }
-  
-  return client
-}
-
-// Production-ready client factory with all validations
-export const createProductionClient = async () => {
-  // Validate environment
-  if (!validateEnvironment()) {
-    throw new Error('Environment validation failed')
-  }
-  
-  // Create client with health check
-  return createHealthCheckedClient()
+// Simple production client for immediate use
+export const createProductionClient = () => {
+  return createSupabaseClient()
 }

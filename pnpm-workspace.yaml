@@ -1,3 +1,5 @@
+# This workspace config is for compatibility
+# Vercel will use npm workspaces via package.json
 packages:
   - "apps/*"
   - "packages/*"
