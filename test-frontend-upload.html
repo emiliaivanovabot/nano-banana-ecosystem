@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Upload Test</title>
+</head>
+<body>
+    <h1>Test Frontend Upload Logic</h1>
+    
+    <input type="file" id="testFile" accept="image/*" />
+    <button onclick="testUpload()">Test Upload</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testUpload() {
+            const fileInput = document.getElementById('testFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+            
+            console.log('🚀 Starting file upload:', {
+                fileName: file.name,
+                fileSize: file.size,
+                fileType: file.type,
+                section: 'main_face',
+                userId: '5bcc1012-7b1b-4ac3-a2e6-3093d492d2c0'
+            });
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('section', 'main_face');
+            formData.append('userId', '5bcc1012-7b1b-4ac3-a2e6-3093d492d2c0');
+            
+            console.log('📝 FormData prepared:', {
+                hasFile: formData.has('file'),
+                section: formData.get('section'),
+                userId: formData.get('userId'),
+                fileDetails: {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                }
+            });
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/user/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('📡 Response received:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
+                const result = await response.json();
+                console.log('📦 Response data:', result);
+                
+                document.getElementById('result').innerHTML = 
+                    '<h3>Result:</h3>' +
+                    '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                
+                if (result.imageUrl) {
+                    document.getElementById('result').innerHTML += 
+                        '<h4>Uploaded Image:</h4>' +
+                        '<img src="' + result.imageUrl + '" style="max-width: 200px;" />';
+                }
+                
+            } catch (error) {
+                console.error('❌ Upload error:', error);
+                document.getElementById('result').innerHTML = 
+                    '<h3>Error:</h3>' + 
+                    '<pre>' + error.message + '</pre>';
+            }
+        }
+    </script>
+</body>
+</html>

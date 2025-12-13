@@ -27,6 +27,14 @@ export default function FaceImageUpload({
     const file = event.target.files?.[0]
     if (!file) return
 
+    console.log('🚀 Starting file upload:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      section,
+      userId
+    })
+
     setIsUploading(true)
     setUploadError(null)
 
@@ -36,20 +44,40 @@ export default function FaceImageUpload({
       formData.append('section', section)
       formData.append('userId', userId)
 
+      console.log('📝 FormData prepared:', {
+        hasFile: formData.has('file'),
+        section: formData.get('section'),
+        userId: formData.get('userId'),
+        fileDetails: {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        }
+      })
+      console.log('📝 Making fetch request to /api/user/upload-image')
+
       const response = await fetch('/api/user/upload-image', {
         method: 'POST',
         body: formData
       })
 
+      console.log('📡 Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      })
+
       const result = await response.json()
+      console.log('📦 Response data:', result)
 
       if (!response.ok) {
         throw new Error(result.error || 'Upload failed')
       }
 
+      console.log('✅ Upload successful, calling onImageUploaded with:', result.imageUrl)
       onImageUploaded(result.imageUrl)
     } catch (error) {
-      console.error('Upload error:', error)
+      console.error('❌ Upload error:', error)
       setUploadError(error instanceof Error ? error.message : 'Upload failed')
     } finally {
       setIsUploading(false)
@@ -80,7 +108,7 @@ export default function FaceImageUpload({
         disabled={disabled || isUploading}
       />
 
-      {imageUrl ? (
+      {imageUrl && imageUrl.length > 0 ? (
         <div className="relative group">
           <img 
             src={imageUrl} 
@@ -153,9 +181,16 @@ export default function FaceImageUpload({
       {/* Error message */}
       {uploadError && (
         <div className="mt-2 text-sm text-red-600">
-          {uploadError}
+          ❌ {uploadError}
         </div>
       )}
+      
+      {/* Debug info */}
+      <div className="mt-1 text-xs text-gray-500">
+        Debug: Section={section}, UserId={userId?.slice(0,8)}..., HasImage={imageUrl && imageUrl.length > 0}
+        <div className="mt-1">ImageURL Type: {typeof imageUrl}, Value: {imageUrl || 'EMPTY'}</div>
+        <div className="mt-1">ImageURL Length: {imageUrl?.length || 0}</div>
+      </div>
     </div>
   )
 }

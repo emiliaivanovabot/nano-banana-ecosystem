@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@repo/auth-config'
 import { V1User } from '@repo/database'
-import FaceImageUpload from '../../components/FaceImageUpload'
 
 // V1 User Settings Interface (exact replication)
 interface UserSettings {
@@ -226,6 +225,7 @@ export default function SettingsPage() {
       </div>
     )
   }
+  
 
   if (!user) {
     return null // Will redirect to login
@@ -350,13 +350,82 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Main Face
                 </label>
-                <FaceImageUpload
-                  imageUrl={userSettings.main_face_image_url}
-                  section="main_face"
-                  userId={user.id}
-                  onImageUploaded={(imageUrl) => handleInputChange('main_face_image_url', imageUrl)}
-                  onImageRemoved={() => handleInputChange('main_face_image_url', '')}
-                  disabled={isAutoSaving}
+                {userSettings.main_face_image_url && userSettings.main_face_image_url.length > 0 ? (
+                  <div>
+                    <img 
+                      src={decodeURIComponent(userSettings.main_face_image_url)} 
+                      alt="Main face"
+                      className="w-full h-32 object-cover rounded-md border border-gray-300 mb-2"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => document.getElementById('main_face_input').click()}
+                        disabled={isAutoSaving}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
+                      >
+                        Replace
+                      </button>
+                      <button
+                        onClick={() => handleInputChange('main_face_image_url', '')}
+                        disabled={isAutoSaving}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => document.getElementById('main_face_input').click()}
+                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  >
+                    <svg
+                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <div className="text-sm text-gray-600">
+                      Click to upload main face
+                    </div>
+                  </div>
+                )}
+                <input
+                  id="main_face_input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file || !user?.id) return
+                    
+                    try {
+                      const formData = new FormData()
+                      formData.append('file', file)
+                      formData.append('section', 'main_face')
+                      formData.append('userId', user.id)
+                      
+                      const response = await fetch('/api/user/upload-image', {
+                        method: 'POST',
+                        body: formData
+                      })
+                      
+                      const result = await response.json()
+                      
+                      if (response.ok) {
+                        handleInputChange('main_face_image_url', result.imageUrl)
+                      }
+                    } catch (error) {
+                      console.error('Upload failed:', error)
+                    }
+                  }}
                 />
               </div>
 
@@ -372,13 +441,84 @@ export default function SettingsPage() {
                   className="w-full px-3 py-1 mb-2 border border-gray-300 rounded-md text-sm"
                   placeholder="Face name (optional)"
                 />
-                <FaceImageUpload
-                  imageUrl={userSettings.face_2_image_url}
-                  section="face_2"
-                  userId={user.id}
-                  onImageUploaded={(imageUrl) => handleInputChange('face_2_image_url', imageUrl)}
-                  onImageRemoved={() => handleInputChange('face_2_image_url', '')}
-                  disabled={isAutoSaving}
+                {userSettings.face_2_image_url && userSettings.face_2_image_url.length > 0 ? (
+                  <div className="relative group">
+                    <img 
+                      src={decodeURIComponent(userSettings.face_2_image_url)} 
+                      alt="Face 2 image"
+                      className="w-full h-32 object-cover rounded-md border border-gray-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-md flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
+                        <button
+                          onClick={() => document.getElementById('face_2_input').click()}
+                          disabled={isAutoSaving}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          onClick={() => handleInputChange('face_2_image_url', '')}
+                          disabled={isAutoSaving}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => document.getElementById('face_2_input').click()}
+                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  >
+                    <svg
+                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <div className="text-sm text-gray-600">
+                      Click to upload face 2
+                    </div>
+                  </div>
+                )}
+                <input
+                  id="face_2_input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file || !user?.id) return
+                    
+                    try {
+                      const formData = new FormData()
+                      formData.append('file', file)
+                      formData.append('section', 'face_2')
+                      formData.append('userId', user.id)
+                      
+                      const response = await fetch('/api/user/upload-image', {
+                        method: 'POST',
+                        body: formData
+                      })
+                      
+                      const result = await response.json()
+                      
+                      if (response.ok) {
+                        handleInputChange('face_2_image_url', result.imageUrl)
+                      }
+                    } catch (error) {
+                      console.error('Upload failed:', error)
+                    }
+                  }}
                 />
               </div>
 
@@ -394,13 +534,84 @@ export default function SettingsPage() {
                   className="w-full px-3 py-1 mb-2 border border-gray-300 rounded-md text-sm"
                   placeholder="Face name (optional)"
                 />
-                <FaceImageUpload
-                  imageUrl={userSettings.face_3_image_url}
-                  section="face_3"
-                  userId={user.id}
-                  onImageUploaded={(imageUrl) => handleInputChange('face_3_image_url', imageUrl)}
-                  onImageRemoved={() => handleInputChange('face_3_image_url', '')}
-                  disabled={isAutoSaving}
+                {userSettings.face_3_image_url && userSettings.face_3_image_url.length > 0 ? (
+                  <div className="relative group">
+                    <img 
+                      src={decodeURIComponent(userSettings.face_3_image_url)} 
+                      alt="Face 3 image"
+                      className="w-full h-32 object-cover rounded-md border border-gray-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-md flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
+                        <button
+                          onClick={() => document.getElementById('face_3_input').click()}
+                          disabled={isAutoSaving}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          onClick={() => handleInputChange('face_3_image_url', '')}
+                          disabled={isAutoSaving}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => document.getElementById('face_3_input').click()}
+                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  >
+                    <svg
+                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <div className="text-sm text-gray-600">
+                      Click to upload face 3
+                    </div>
+                  </div>
+                )}
+                <input
+                  id="face_3_input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file || !user?.id) return
+                    
+                    try {
+                      const formData = new FormData()
+                      formData.append('file', file)
+                      formData.append('section', 'face_3')
+                      formData.append('userId', user.id)
+                      
+                      const response = await fetch('/api/user/upload-image', {
+                        method: 'POST',
+                        body: formData
+                      })
+                      
+                      const result = await response.json()
+                      
+                      if (response.ok) {
+                        handleInputChange('face_3_image_url', result.imageUrl)
+                      }
+                    } catch (error) {
+                      console.error('Upload failed:', error)
+                    }
+                  }}
                 />
               </div>
             </div>
