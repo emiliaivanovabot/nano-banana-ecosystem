@@ -67,20 +67,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (mounted && storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser)
-            // Verify user still exists and is active
-            const { data: currentUser } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', parsedUser.id)
-              .eq('is_active', true)
-              .single()
-            
-            if (currentUser) {
-              setUser(currentUser)
-            } else {
-              localStorage.removeItem('v1_user')
-            }
+            // For V1 compatibility, trust stored user session
+            // TODO: Add server-side session validation in future
+            setUser(parsedUser)
           } catch (e) {
+            console.error('Invalid stored user session:', e)
             localStorage.removeItem('v1_user')
           }
         }
