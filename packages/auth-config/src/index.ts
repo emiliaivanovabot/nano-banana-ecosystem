@@ -128,58 +128,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string) => {
     try {
-      // V1 Authentication: Use hardcoded login users from environment
-      const loginUsersEnv = process.env.NEXT_PUBLIC_LOGIN_USERS || process.env.VITE_LOGIN_USERS
-      
-      if (!loginUsersEnv) {
-        console.error('LOGIN_USERS environment variable not found')
-        return { user: null, error: 'Authentication system not configured' }
-      }
-      
-      let loginUsers
-      try {
-        loginUsers = JSON.parse(loginUsersEnv)
-      } catch (e) {
-        console.error('Invalid LOGIN_USERS format:', e)
-        return { user: null, error: 'Authentication configuration error' }
-      }
-      
-      // Find user in hardcoded list
-      const foundUser = loginUsers.find((u: any) => 
-        u.username === username && u.password === password
-      )
-      
-      if (!foundUser) {
-        return { user: null, error: 'Invalid username or password' }
-      }
-      
-      // Try to get user profile from database if exists
-      const { data: dbUser } = await supabase
+      // V1 Authentication: Query the actual V1 Supabase users table
+      const { data: user, error } = await supabase
         .from('users')
         .select('*')
         .eq('username', username)
+        .eq('is_active', true)
         .single()
+
+      if (error || !user) {
+        console.log('User not found:', username, error?.message)
         
-      // Create user object (merge hardcoded data with DB data if available)
-      const user = dbUser || {
-        id: foundUser.modelId || foundUser.username,
-        username: foundUser.username,
-        password_hash: foundUser.password,
-        email: foundUser.username + '@nano-banana.local',
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        subscription_level: 'premium',
-        credits_remaining: 1000
+        // Fallback to environment login users only if database fails
+        const loginUsersEnv = process.env.NEXT_PUBLIC_LOGIN_USERS || process.env.VITE_LOGIN_USERS
+        if (loginUsersEnv) {
+          try {
+            const loginUsers = JSON.parse(loginUsersEnv)
+            const foundUser = loginUsers.find((u: any) => 
+              u.username === username && u.password === password
+            )
+            
+            if (foundUser) {
+              const fallbackUser = {
+                id: foundUser.modelId || foundUser.username,
+                username: foundUser.username,
+                email: foundUser.username + '@nano-banana.local',
+                is_active: true,
+                created_at: new Date().toISOString(),
+                subscription_level: 'premium',
+                credits_remaining: 1000
+              }
+              localStorage.setItem('v1_user', JSON.stringify(fallbackUser))
+              setUser(fallbackUser)
+              return { user: fallbackUser, error: null }
+            }
+          } catch (e) {
+            console.error('Fallback auth error:', e)
+          }
+        }
+        
+        return { user: null, error: 'Invalid username or password' }
       }
-      
-      // Update last login if user exists in DB
-      if (dbUser) {
-        await supabase
-          .from('users')
-          .update({ last_login: new Date().toISOString() })
-          .eq('id', dbUser.id)
+
+      // V1 uses bcrypt password hashing - we need to verify on server side
+      // For now, let's create a simple API route to handle bcrypt verification
+      try {
+        const authResponse = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        })
+        
+        if (!authResponse.ok) {
+          return { user: null, error: 'Invalid username or password' }
+        }
+        
+        const { valid } = await authResponse.json()
+        
+        if (!valid) {
+          return { user: null, error: 'Invalid username or password' }
+        }
+      } catch (fetchError) {
+        console.error('Auth API error:', fetchError)
+        return { user: null, error: 'Authentication service unavailable' }
       }
+
+      // Update last login
+      await supabase
+        .from('users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', user.id)
 
       // Store user in session
       localStorage.setItem('v1_user', JSON.stringify(user))
