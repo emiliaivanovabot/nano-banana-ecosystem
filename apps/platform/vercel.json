@@ -1,18 +1,10 @@
 {
   "version": 2,
-  "name": "nano-platform-v2",
+  "name": "page-evolution",
   "buildCommand": "cd ../.. && npx turbo build --filter=platform",
   "installCommand": "cd ../.. && npm install",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "env": {
-    "VITE_SUPABASE_URL": "@nano_supabase_url",
-    "VITE_SUPABASE_ANON_KEY": "@nano_supabase_anon_key", 
-    "SUPABASE_SERVICE_ROLE_KEY": "@nano_supabase_service_key",
-    "NEXT_PUBLIC_SUPABASE_URL": "@nano_supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@nano_supabase_anon_key",
-    "JWT_SECRET": "@nano_jwt_secret"
-  },
   "regions": ["fra1"],
   "functions": {
     "src/app/api/**/*.ts": {
