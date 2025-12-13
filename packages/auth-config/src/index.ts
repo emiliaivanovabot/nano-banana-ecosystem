@@ -149,14 +149,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             )
             
             if (foundUser) {
-              const fallbackUser = {
+              const fallbackUser: User = {
                 id: foundUser.modelId || foundUser.username,
                 username: foundUser.username,
+                password_hash: '',
                 email: foundUser.username + '@nano-banana.local',
                 is_active: true,
                 created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
                 subscription_level: 'premium',
-                credits_remaining: 1000
+                credits_remaining: 1000,
+                use_personalization: false,
+                use_personal_appearance_text: false
               }
               localStorage.setItem('v1_user', JSON.stringify(fallbackUser))
               setUser(fallbackUser)
