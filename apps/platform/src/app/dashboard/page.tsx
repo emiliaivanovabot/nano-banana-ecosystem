@@ -128,10 +128,10 @@ export default function Dashboard() {
                     </span>
                   </dd>
                 </div>
-                {v1User.preferred_model && (
+                {v1User.default_resolution && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Preferred Model</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{v1User.preferred_model}</dd>
+                    <dt className="text-sm font-medium text-gray-500">Default Resolution</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{v1User.default_resolution}</dd>
                   </div>
                 )}
               </div>
