@@ -28,14 +28,17 @@ export async function POST(request: NextRequest) {
     // Create database client
     const supabase = createServerSupabaseClient()
 
-    // Create generation record
+    // Create generation record using V1 generations table
     const { data: generation, error: dbError } = await supabase
-      .from('seedream_generations')
+      .from('generations')
       .insert({
         user_id: userId,
         prompt,
-        style_preset: style,
-        status: 'pending'
+        generation_type: 'seedream',
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        retry_count: 0,
+        gemini_metadata: { style_preset: style }
       })
       .select()
       .single()
@@ -52,13 +55,14 @@ export async function POST(request: NextRequest) {
     // For now, return a placeholder response
     const mockImageUrl = `https://picsum.photos/512/512?random=${Date.now()}`
     
-    // Update generation with result
+    // Update generation with result using V1 schema
     const { error: updateError } = await supabase
-      .from('seedream_generations')
+      .from('generations')
       .update({
-        image_url: mockImageUrl,
+        result_image_url: mockImageUrl,
         status: 'completed',
-        completed_at: new Date().toISOString()
+        completed_at: new Date().toISOString(),
+        generation_time_seconds: 2 // Mock value
       })
       .eq('id', generation.id)
 

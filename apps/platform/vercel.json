@@ -1,11 +1,19 @@
 {
   "version": 2,
-  "name": "platform",
-  "buildCommand": "cd ../.. && npm run build --filter=platform",
-  "devCommand": "cd ../.. && npm run dev --filter=platform",
+  "name": "nano-platform-v2",
+  "buildCommand": "cd ../.. && npx turbo build --filter=platform",
   "installCommand": "cd ../.. && npm install",
   "outputDirectory": ".next",
   "framework": "nextjs",
+  "env": {
+    "VITE_SUPABASE_URL": "@nano_supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@nano_supabase_anon_key", 
+    "SUPABASE_SERVICE_ROLE_KEY": "@nano_supabase_service_key",
+    "NEXT_PUBLIC_SUPABASE_URL": "@nano_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@nano_supabase_anon_key",
+    "JWT_SECRET": "@nano_jwt_secret"
+  },
+  "regions": ["fra1"],
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30

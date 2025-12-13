@@ -1,11 +1,22 @@
 {
   "version": 2,
-  "name": "seedream", 
-  "buildCommand": "cd ../.. && npm run build --filter=seedream",
-  "devCommand": "cd ../.. && npm run dev --filter=seedream", 
+  "name": "nano-seedream-v2",
+  "buildCommand": "cd ../.. && npx turbo build --filter=seedream",
   "installCommand": "cd ../.. && npm install",
   "outputDirectory": ".next",
   "framework": "nextjs",
+  "env": {
+    "VITE_SUPABASE_URL": "@nano_supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@nano_supabase_anon_key", 
+    "SUPABASE_SERVICE_ROLE_KEY": "@nano_supabase_service_key",
+    "NEXT_PUBLIC_SUPABASE_URL": "@nano_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@nano_supabase_anon_key",
+    "JWT_SECRET": "@nano_jwt_secret",
+    "VITE_RUNPOD_API_KEY": "@nano_runpod_api_key",
+    "VITE_RUNPOD_ENDPOINT_ID": "@nano_runpod_endpoint",
+    "VITE_GEMINI_API_KEY": "@nano_gemini_api_key"
+  },
+  "regions": ["fra1"],
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30

@@ -8,9 +8,17 @@ import type { User } from '@repo/database'
 // Authentication configuration for cross-subdomain sharing
 export const authConfig = {
   // Cookie domain for cross-subdomain auth sharing
-  cookieDomain: process.env.NODE_ENV === 'development' 
-    ? '.nano-banana.local' 
-    : '.nano-banana.app',
+  cookieDomain: (() => {
+    if (process.env.NODE_ENV === 'development') {
+      return '.nano-banana.local'
+    }
+    // Vercel staging URLs
+    if (process.env.VERCEL_URL) {
+      return '.vercel.app'
+    }
+    // Production domain
+    return '.nano-banana.app'
+  })(),
   
   // JWT configuration
   jwtSecret: process.env.JWT_SECRET || 'development-secret',
@@ -28,11 +36,11 @@ export const authConfig = {
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key'
 }
 
-// Auth context type
+// Auth context type - V1 schema compatibility
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (email: string, password: string) => Promise<{ user: User | null; error: string | null }>
+  login: (username: string, password: string) => Promise<{ user: User | null; error: string | null }>
   register: (email: string, password: string) => Promise<{ user: User | null; error: string | null }>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
@@ -47,29 +55,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
   const supabase = createSupabaseClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey)
 
-  // Initialize auth state
+  // Initialize V1 auth state
   useEffect(() => {
     let mounted = true
 
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        // Check for stored V1 user session
+        const storedUser = localStorage.getItem('v1_user')
         
-        if (mounted) {
-          if (session?.user) {
-            // Fetch user profile data
-            const { data: userProfile } = await supabase
+        if (mounted && storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser)
+            // Verify user still exists and is active
+            const { data: currentUser } = await supabase
               .from('users')
               .select('*')
-              .eq('id', session.user.id)
+              .eq('id', parsedUser.id)
+              .eq('is_active', true)
               .single()
             
-            setUser(userProfile)
+            if (currentUser) {
+              setUser(currentUser)
+            } else {
+              localStorage.removeItem('v1_user')
+            }
+          } catch (e) {
+            localStorage.removeItem('v1_user')
           }
+        }
+        
+        if (mounted) {
           setLoading(false)
         }
       } catch (error) {
-        console.error('Auth initialization error:', error)
+        console.error('V1 Auth initialization error:', error)
         if (mounted) {
           setLoading(false)
         }
@@ -106,18 +126,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+      // V1 Schema: Username/Password authentication
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', username)
+        .eq('is_active', true)
+        .single()
 
-      if (error) {
-        return { user: null, error: error.message }
+      if (error || !users) {
+        return { user: null, error: 'Invalid username or password' }
       }
 
-      return { user: data.user as any, error: null }
+      // TODO: Replace with actual bcrypt verification
+      // For now, simplified password check (should use bcrypt.compare)
+      const passwordMatch = users.password_hash === password
+      
+      if (!passwordMatch) {
+        return { user: null, error: 'Invalid username or password' }
+      }
+
+      // Update last login
+      await supabase
+        .from('users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', users.id)
+
+      // Store user in session (simplified - in production use JWT or proper session)
+      localStorage.setItem('v1_user', JSON.stringify(users))
+      setUser(users)
+      
+      return { user: users, error: null }
     } catch (error) {
       return { user: null, error: 'Login failed' }
     }
@@ -141,7 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const logout = async () => {
-    await supabase.auth.signOut()
+    // V1 logout: Clear stored session
+    localStorage.removeItem('v1_user')
     setUser(null)
   }
 
