@@ -32,8 +32,8 @@ export const authConfig = {
   },
 
   // Supabase client configuration
-  supabaseUrl: process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-  supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key'
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
+  supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-anon-key'
 }
 
 // Auth context type - V1 schema compatibility
@@ -128,38 +128,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string) => {
     try {
-      // V1 Schema: Username/Password authentication
-      const { data: users, error } = await supabase
+      // V1 Authentication: Use hardcoded login users from environment
+      const loginUsersEnv = process.env.NEXT_PUBLIC_LOGIN_USERS || process.env.VITE_LOGIN_USERS
+      
+      if (!loginUsersEnv) {
+        console.error('LOGIN_USERS environment variable not found')
+        return { user: null, error: 'Authentication system not configured' }
+      }
+      
+      let loginUsers
+      try {
+        loginUsers = JSON.parse(loginUsersEnv)
+      } catch (e) {
+        console.error('Invalid LOGIN_USERS format:', e)
+        return { user: null, error: 'Authentication configuration error' }
+      }
+      
+      // Find user in hardcoded list
+      const foundUser = loginUsers.find((u: any) => 
+        u.username === username && u.password === password
+      )
+      
+      if (!foundUser) {
+        return { user: null, error: 'Invalid username or password' }
+      }
+      
+      // Try to get user profile from database if exists
+      const { data: dbUser } = await supabase
         .from('users')
         .select('*')
         .eq('username', username)
-        .eq('is_active', true)
         .single()
-
-      if (error || !users) {
-        return { user: null, error: 'Invalid username or password' }
+        
+      // Create user object (merge hardcoded data with DB data if available)
+      const user = dbUser || {
+        id: foundUser.modelId || foundUser.username,
+        username: foundUser.username,
+        password_hash: foundUser.password,
+        email: foundUser.username + '@nano-banana.local',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        subscription_level: 'premium',
+        credits_remaining: 1000
+      }
+      
+      // Update last login if user exists in DB
+      if (dbUser) {
+        await supabase
+          .from('users')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', dbUser.id)
       }
 
-      // TODO: Replace with actual bcrypt verification
-      // For now, simplified password check (should use bcrypt.compare)
-      const passwordMatch = users.password_hash === password
+      // Store user in session
+      localStorage.setItem('v1_user', JSON.stringify(user))
+      setUser(user)
       
-      if (!passwordMatch) {
-        return { user: null, error: 'Invalid username or password' }
-      }
-
-      // Update last login
-      await supabase
-        .from('users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', users.id)
-
-      // Store user in session (simplified - in production use JWT or proper session)
-      localStorage.setItem('v1_user', JSON.stringify(users))
-      setUser(users)
-      
-      return { user: users, error: null }
+      return { user, error: null }
     } catch (error) {
+      console.error('Login error:', error)
       return { user: null, error: 'Login failed' }
     }
   }
