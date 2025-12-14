@@ -6,7 +6,7 @@ import { useAuth } from '@repo/auth-config'
 
 export default function NanoBananaPage() {
   // V1 State Management - EXACT REPLICATION
-  const { user, session, loading: authLoading } = useAuth()
+  const { user } = useAuth()
   const [userSettings, setUserSettings] = useState(null)
   const [prompt, setPrompt] = useState('')
   const [images, setImages] = useState([])
@@ -21,7 +21,8 @@ export default function NanoBananaPage() {
   const [templatesCollapsed, setTemplatesCollapsed] = useState(true)
   const [showPersonalization, setShowPersonalization] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-  // V1 Style - No complex face image states needed
+  const [faceImageLoaded, setFaceImageLoaded] = useState(false)
+  const [faceImageError, setFaceImageError] = useState(false)
   const [personalAppearanceText, setPersonalAppearanceText] = useState('')
   const [isEditingPersonalText, setIsEditingPersonalText] = useState(false)
   const [usePersonalization, setUsePersonalization] = useState(true)
@@ -89,47 +90,64 @@ export default function NanoBananaPage() {
     return baseText
   }
 
-  // User Settings Loading - Dashboard Pattern
+  // V2 User Settings Loading - FIXED
   useEffect(() => {
-    if (user) {
-      console.log('🔄 Loading user settings for user:', user.id)
-      loadUserSettings()
-    }
-  }, [user])
+    const loadUserSettings = async () => {
+      if (!user?.id) return
 
-  const loadUserSettings = async () => {
-    if (!user?.id) return
-
-    try {
-      console.log('🔍 Loading user settings for:', user.id)
-      const response = await fetch(`/api/user/settings?userId=${user.id}`)
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      try {
+        console.log('🔍 Loading user settings for:', user.id)
+        const response = await fetch(`/api/user/settings?userId=${user.id}`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+        
+        const data = await response.json()
+        console.log('📦 User settings response:', data)
+        
+        if (data.settings) {
+          console.log('✅ User settings loaded:', data.settings)
+          setUserSettings(data.settings)
+          setResolution(data.settings.default_resolution || '2K')
+          setAspectRatio(data.settings.default_aspect_ratio || '9:16')
+          setPersonalAppearanceText(data.settings.personal_appearance_text || '')
+          setShowPersonalization(data.settings.use_personalization !== false)
+          setUsePersonalization(data.settings.use_personal_appearance_text !== false)
+          console.log('🖼️ Face image URL:', data.settings.main_face_image_url)
+          // Reset face image states when new settings load
+          setFaceImageLoaded(false)
+          setFaceImageError(false)
+        } else {
+          console.log('❌ No settings in response')
+        }
+      } catch (error) {
+        console.error('❌ Error loading user settings:', error)
       }
-      
-      const data = await response.json()
-      console.log('📦 User settings response:', data)
-      
-      if (data.settings) {
-        console.log('✅ User settings loaded:', data.settings)
-        setUserSettings(data.settings)
-        setResolution(data.settings.default_resolution || '2K')
-        setAspectRatio(data.settings.default_aspect_ratio || '9:16')
-        setPersonalAppearanceText(data.settings.personal_appearance_text || '')
-        setShowPersonalization(data.settings.use_personalization !== false)
-        setUsePersonalization(data.settings.use_personal_appearance_text !== false)
-        console.log('🖼️ Face image URL:', data.settings.main_face_image_url)
-        // V1 Style - Face image will be displayed immediately when userSettings is set
-      } else {
-        console.log('❌ No settings in response')
-      }
-    } catch (error) {
-      console.error('❌ Error loading user settings:', error)
     }
-  }
 
-  // V1 Style - Face image displayed directly when userSettings is available
+    loadUserSettings()
+  }, [user?.id])
+
+  // Face Image Loading Effect - Ensure image loads when userSettings changes
+  useEffect(() => {
+    if (userSettings?.main_face_image_url && showMainFaceImage) {
+      console.log('🔄 Face image URL available, preloading:', userSettings.main_face_image_url)
+      // Preload the image to ensure it's ready to display
+      const img = new Image()
+      img.onload = () => {
+        console.log('✅ Face image preloaded successfully')
+        setFaceImageLoaded(true)
+        setFaceImageError(false)
+      }
+      img.onerror = () => {
+        console.error('❌ Face image preload failed')
+        setFaceImageError(true)
+        setFaceImageLoaded(false)
+      }
+      img.src = decodeURIComponent(userSettings.main_face_image_url)
+    }
+  }, [userSettings?.main_face_image_url, showMainFaceImage])
 
   // Save personal appearance text to database - V1 EXACT
   const savePersonalAppearanceText = async (newText) => {
@@ -727,19 +745,27 @@ export default function NanoBananaPage() {
                 background: 'hsl(var(--card))'
               }}
             >
-              {userSettings?.main_face_image_url && showMainFaceImage ? (
+              {userSettings?.main_face_image_url && userSettings.main_face_image_url.length > 0 && showMainFaceImage ? (
                 <>
                   <img 
-                    src={userSettings.main_face_image_url}
-                    alt="Gesichtsbild"
+                    src={userSettings.main_face_image_url.startsWith('data:') ? userSettings.main_face_image_url : decodeURIComponent(userSettings.main_face_image_url)}
+                    alt="Main Face"
+                    onLoad={() => {
+                      setFaceImageLoaded(true)
+                      setFaceImageError(false)
+                      console.log('✅ Face image loaded successfully')
+                    }}
+                    onError={(e) => {
+                      setFaceImageError(true)
+                      setFaceImageLoaded(false)
+                      console.error('❌ Face image failed to load:', userSettings?.main_face_image_url)
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover'
-                    }}
-                    onError={(e) => {
-                      console.log('Face image failed to load:', userSettings.main_face_image_url)
-                      e.target.style.display = 'none'
+                      objectFit: 'cover',
+                      opacity: faceImageError ? 0.5 : 1,
+                      transition: 'opacity 0.3s ease'
                     }}
                   />
                   <button
@@ -786,11 +812,19 @@ export default function NanoBananaPage() {
                 }}
                 title={showMainFaceImage === false ? "Gesichtsbild wiederherstellen" : "Kein Gesichtsbild verfügbar"}
                 >
-                  👤
-                  {showMainFaceImage === false && (
-                    <div style={{ fontSize: '8px', marginTop: '2px', textAlign: 'center' }}>
-                      Klicken zum<br/>Wiederherstellen
+                  {userSettings && userSettings.main_face_image_url && showMainFaceImage && !faceImageLoaded && !faceImageError ? (
+                    <div style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center' }}>
+                      Loading...
                     </div>
+                  ) : (
+                    <>
+                      👤
+                      {showMainFaceImage === false && (
+                        <div style={{ fontSize: '8px', marginTop: '2px', textAlign: 'center' }}>
+                          Klicken zum<br/>Wiederherstellen
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
