@@ -54,7 +54,7 @@ export default function CollabPage() {
     const parts = []
     
     // Age - convert to natural description
-    if (userSettings.age_range) {
+    if (userSettings && userSettings.age_range) {
       switch(userSettings.age_range) {
         case 'under-20': parts.push("A teenage woman"); break;
         case 'young-adult': parts.push("A young adult woman"); break;
