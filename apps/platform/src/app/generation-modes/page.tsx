@@ -202,7 +202,7 @@ export default function GenerationModesPage() {
           return (
             <div key={mode.id} style={{ position: 'relative' }}>
               {mode.available ? (
-                <Link
+                <a
                   href={mode.path}
                   style={{
                     textDecoration: 'none',
@@ -282,7 +282,7 @@ export default function GenerationModesPage() {
                   {mode.id === 'model-generation' && (
                     <span style={{ fontSize: isMobile ? '20px' : '24px', flexShrink: 0 }}>🍌</span>
                   )}
-                </Link>
+                </a>
               ) : (
                 <div
                   style={{
