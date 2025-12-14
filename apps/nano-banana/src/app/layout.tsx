@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import StyledJsxRegistry from './registry'
 
 export const metadata: Metadata = {
   title: 'Nano Banana',
@@ -12,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StyledJsxRegistry>{children}</StyledJsxRegistry>
+      </body>
     </html>
   )
 }
