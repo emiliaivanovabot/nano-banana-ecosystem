@@ -4,10 +4,32 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useAuth } from '@repo/auth-config'
 import { createServerSupabaseClient } from '@repo/database'
 
+// V1 User Settings Interface (shared with settings page)
+interface UserSettings {
+  username: string
+  email: string
+  gemini_api_key: string
+  main_face_image_url: string
+  face_2_image_url: string
+  face_2_name: string
+  face_3_image_url: string
+  face_3_name: string
+  hair_color: string
+  eye_color: string
+  skin_tone: string
+  age_range: string
+  default_resolution: string
+  default_aspect_ratio: string
+  use_personalization: boolean
+  use_personal_appearance_text: boolean
+  personal_appearance_text: string
+  favorite_prompts: string[]
+}
+
 export default function CollabPage() {
   // V1 State Management - exact replication
   const { user } = useAuth()
-  const [userSettings, setUserSettings] = useState(null)
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null)
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [results, setResults] = useState([])
