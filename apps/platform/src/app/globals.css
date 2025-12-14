@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card: 240 8% 7%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 5% 15%;
+  --primary: 47 100% 65%;
+  --primary-foreground: #000000;
+  --secondary: 280 70% 60%;
+  --secondary-foreground: 0 0% 98%;
 }
 
 @theme inline {
@@ -16,6 +23,10 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --card: #1a1a1a;
+    --border: #374151;
+    --primary-foreground: #000000;
+    --secondary-foreground: #ffffff;
   }
 }
 

@@ -151,6 +151,42 @@ export default function Dashboard() {
             <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
               <div className="p-6">
                 <div className="flex items-center">
+                  <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">🍌</span>
+                  </div>
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Nano Banana</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  AI image generation suite with 5 specialized modules
+                </p>
+                <div className="mt-4">
+                  <div className="flex gap-2">
+                    <a
+                      href="/generation-modes"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    >
+                      Launch Nano Banana
+                    </a>
+                    <a
+                      href="/gallery"
+                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    >
+                      📸 Gallery
+                    </a>
+                    <a
+                      href="/inspiration"
+                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    >
+                      💡 Inspiration
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
+              <div className="p-6">
+                <div className="flex items-center">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">S</span>
                   </div>

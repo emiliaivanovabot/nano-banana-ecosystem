@@ -88,25 +88,36 @@ export default function NanoBananaPage() {
     return baseText
   }
 
-  // V1 User Settings Loading - exact copy
+  // V2 User Settings Loading - FIXED
   useEffect(() => {
     const loadUserSettings = async () => {
       if (!user?.id) return
 
       try {
+        console.log('🔍 Loading user settings for:', user.id)
         const response = await fetch(`/api/user/settings?userId=${user.id}`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+        
         const data = await response.json()
+        console.log('📦 User settings response:', data)
         
         if (data.settings) {
+          console.log('✅ User settings loaded:', data.settings)
           setUserSettings(data.settings)
           setResolution(data.settings.default_resolution || '2K')
           setAspectRatio(data.settings.default_aspect_ratio || '9:16')
           setPersonalAppearanceText(data.settings.personal_appearance_text || '')
           setShowPersonalization(data.settings.use_personalization !== false)
           setUsePersonalization(data.settings.use_personal_appearance_text !== false)
+          console.log('🖼️ Face image URL:', data.settings.main_face_image_url)
+        } else {
+          console.log('❌ No settings in response')
         }
       } catch (error) {
-        console.error('Error loading user settings:', error)
+        console.error('❌ Error loading user settings:', error)
       }
     }
 
@@ -365,15 +376,30 @@ export default function NanoBananaPage() {
         hasInlineData: !!part.inline_data
       })))
 
-      // V1 Request Body - SIMPLE FORMAT (NO SCHEMA)
+      // V1 Request Body - WITH GENERATION CONFIG
       const requestBody = {
         contents: [{
           role: "user",
           parts: parts
-        }]
+        }],
+        generationConfig: {
+          response_modalities: ['TEXT', 'IMAGE'],
+          image_config: {
+            aspect_ratio: aspectRatio,
+            image_size: resolution
+          }
+        }
       }
 
       console.log('🚀 Making Gemini API call...')
+      console.log('📋 API Details:', {
+        model: model,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        hasApiKey: !!apiKey,
+        apiKeyStart: apiKey?.substring(0, 10),
+        partsCount: parts.length,
+        hasImages: parts.filter(p => p.inline_data).length
+      })
       
       // V1 API Call - EXACT COPY
       const response = await fetch(
@@ -393,9 +419,9 @@ export default function NanoBananaPage() {
         console.error('🔴 GEMINI API FULL ERROR:', {
           status: response.status,
           statusText: response.statusText,
-          errorBody: errorText,
-          requestBody: JSON.stringify(requestBody, null, 2)
+          errorBody: errorText
         })
+        console.error('📦 FULL REQUEST BODY:', JSON.stringify(requestBody, null, 2))
         throw new Error(`Gemini API Error: ${response.status} - ${errorText}`)
       }
 
@@ -581,33 +607,117 @@ export default function NanoBananaPage() {
 
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
-        {/* V1 Face Image Section - EXACT COPY */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '12px',
-          marginBottom: '20px'
+        {/* V1 Settings + Face Image Section - EXACT COPY */}
+        <div style={{ 
+          marginBottom: '16px',
+          fontSize: '0.9rem'
         }}>
+          <h3 style={{ marginBottom: '8px', textAlign: 'left', fontSize: '1rem' }}>
+            Einstellungen
+          </h3>
           <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            display: 'grid',
+            gridTemplateColumns: '1fr 80px',
+            gap: '12px',
+            alignItems: 'start'
           }}>
+            {/* Left Column: Stacked Buttons */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              height: '80px'
+            }}>
+              <button
+                onClick={() => {
+                  if (resolution === '1K') setResolution('2K')
+                  else if (resolution === '2K') setResolution('4K')
+                  else setResolution('1K')
+                }}
+                style={{
+                  padding: '6px 10px',
+                  background: 'hsl(47 100% 65%)',
+                  color: 'black',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.2s ease',
+                  height: '36px',
+                  flex: '1'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.02)'
+                  e.target.style.boxShadow = '0 2px 8px rgba(251, 113, 133, 0.15)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)'
+                  e.target.style.boxShadow = 'none'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <span style={{ fontWeight: '600', color: 'black' }}>{resolution}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'black' }}>
+                    {resolution === '1K' ? 'Fast' : resolution === '2K' ? 'Optimal' : 'Max'}
+                  </span>
+                </div>
+              </button>
+              
+              <button
+                onClick={() => {
+                  if (aspectRatio === '9:16') setAspectRatio('16:9')
+                  else if (aspectRatio === '16:9') setAspectRatio('4:3')
+                  else if (aspectRatio === '4:3') setAspectRatio('3:4')
+                  else if (aspectRatio === '3:4') setAspectRatio('2:3')
+                  else if (aspectRatio === '2:3') setAspectRatio('3:2')
+                  else setAspectRatio('9:16')
+                }}
+                style={{
+                  padding: '6px 10px',
+                  background: 'hsl(280 70% 60%)',
+                  color: 'hsl(var(--secondary-foreground))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.2s ease',
+                  height: '36px',
+                  flex: '1'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.02)'
+                  e.target.style.boxShadow = '0 2px 8px rgba(251, 113, 133, 0.15)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)'
+                  e.target.style.boxShadow = 'none'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <span style={{ fontWeight: '600', color: 'hsl(var(--secondary-foreground))' }}>{aspectRatio}</span>
+                  <span style={{ fontSize: '0.7rem', color: 'hsl(var(--secondary-foreground))' }}>
+                    {aspectRatio === '9:16' ? 'Story' : 
+                     aspectRatio === '16:9' ? 'Widescreen' :
+                     aspectRatio === '4:3' ? 'Post' :
+                     aspectRatio === '3:4' ? 'Portrait' :
+                     aspectRatio === '2:3' ? 'Portrait' : 'Landscape'}
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* Right Column: Main Face Image Display */}
             <div 
               style={{
                 position: 'relative',
+                width: '80px',
+                height: '80px',
                 borderRadius: '8px',
                 overflow: 'hidden',
-                border: (userSettings?.main_face_image_url && userSettings.main_face_image_url.length > 0 && showMainFaceImage) 
-                  ? '2px solid rgba(244, 63, 94, 0.8)' 
-                  : '1px solid rgba(244, 63, 94, 0.3)',
-                background: (userSettings?.main_face_image_url && userSettings.main_face_image_url.length > 0 && showMainFaceImage)
-                  ? 'rgba(244, 63, 94, 0.1)'
-                  : 'hsl(var(--card))',
-                cursor: 'pointer',
-                aspectRatio: '1',
-                width: '120px',
-                height: '120px'
+                border: '1px solid rgba(251, 191, 36, 0.3)',
+                background: 'hsl(var(--card))'
               }}
             >
               {userSettings?.main_face_image_url && userSettings.main_face_image_url.length > 0 && showMainFaceImage ? (
@@ -945,7 +1055,7 @@ export default function NanoBananaPage() {
                       style={{
                         padding: '12px',
                         background: isSelected ? 'hsl(var(--primary))' : 'hsl(var(--secondary))',
-                        color: isSelected ? 'hsl(var(--primary-foreground))' : 'hsl(var(--secondary-foreground))',
+                        color: isSelected ? '#000000' : 'hsl(var(--secondary-foreground))',
                         border: isSelected ? '2px solid hsl(var(--primary))' : '1px solid hsl(var(--border))',
                         borderRadius: '8px',
                         cursor: 'pointer',
@@ -954,10 +1064,15 @@ export default function NanoBananaPage() {
                         transition: 'all 0.2s ease'
                       }}
                     >
-                      <div style={{ fontWeight: '500', marginBottom: '4px' }}>
-                        {category.labels[promptIndex]}
+                      <div style={{ 
+                        fontWeight: '500', 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <span>{category.labels[promptIndex]}</span>
+                        {isSelected && <span style={{ fontSize: '14px' }}>✓</span>}
                       </div>
-                      {isSelected && <div style={{ fontSize: '12px', opacity: 0.8 }}>✓ Ausgewählt</div>}
                     </button>
                   )
                 })}
@@ -1256,42 +1371,6 @@ export default function NanoBananaPage() {
             </div>
             
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              {/* V1 Settings Dropdowns */}
-              <select
-                value={resolution}
-                onChange={(e) => setResolution(e.target.value)}
-                style={{
-                  padding: '6px 8px',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  fontSize: '0.8rem'
-                }}
-              >
-                <option value="1K">1K</option>
-                <option value="2K">2K</option>
-                <option value="4K">4K</option>
-              </select>
-              
-              <select
-                value={aspectRatio}
-                onChange={(e) => setAspectRatio(e.target.value)}
-                style={{
-                  padding: '6px 8px',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  fontSize: '0.8rem'
-                }}
-              >
-                <option value="1:1">1:1</option>
-                <option value="9:16">9:16</option>
-                <option value="16:9">16:9</option>
-                <option value="4:3">4:3</option>
-                <option value="3:4">3:4</option>
-              </select>
               
               <button
                 onClick={handleGenerate}

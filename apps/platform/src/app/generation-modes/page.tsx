@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@repo/auth-config'
+import { ArrowLeft, Sparkles, Palette, Users, RefreshCw, Zap, Wand2 } from 'lucide-react'
 
 export default function GenerationModesPage() {
   const { user } = useAuth()
@@ -20,33 +21,33 @@ export default function GenerationModesPage() {
 
   const generationModes = [
     {
-      id: 'nano-banana-classic',
+      id: 'model-generation',
       path: '/nano-banana',
-      title: 'Nano Banana Classic',
+      title: 'Nano Banana Pro',
       subtitle: `Erstelle Bilder für ${user?.username || 'dich'}`,
-      description: 'Erstelle Bilder aus Text-Beschreibungen mit Face-Integration',
-      icon: '🍌',
+      description: 'Erstelle Bilder aus Text-Beschreibungen',
+      icon: Palette,
       color: '#a86d09',
-      available: true
-    },
-    {
-      id: 'image-to-image',
-      path: '/image2image',
-      title: 'Image2Image',
-      subtitle: 'Higgsfield für Reiche',
-      description: 'Face-Swap und Bild-Transformation mit KI',
-      icon: '🖼️',
-      color: '#992f63',
       available: true
     },
     {
       id: 'collab-generation', 
       path: '/collab',
-      title: 'Collab Partner',
+      title: 'Collab Generation',
       subtitle: 'Mache Collabs mit anderen',
-      description: 'Gemeinsame Bildgenerierung mit Collab Partner',
-      icon: '🤝',
+      description: 'Gemeinsame Bildgenerierung mit anderen',
+      icon: Users,
       color: '#5a387d',
+      available: true
+    },
+    {
+      id: 'image-to-image',
+      path: '/image2image', 
+      title: 'Image2Image',
+      subtitle: 'Higgsfield für Reiche',
+      description: 'Bearbeite Bilder mit KI-Unterstützung',
+      icon: RefreshCw,
+      color: '#992f63',
       available: true
     },
     {
@@ -55,154 +56,293 @@ export default function GenerationModesPage() {
       title: 'Multi Prompts Generation',
       subtitle: 'Mehrere Prompts gleichzeitig',
       description: 'Generiere Bilder aus mehreren Prompts parallel',
-      icon: '⚡',
+      icon: Zap,
       color: '#059669',
-      available: false // Noch nicht implementiert
+      available: true
     },
     {
-      id: 'grok-generator',
+      id: 'prompt-creator',
       path: '/grok',
-      title: 'Grok Prompt Generator',
+      title: 'AI Prompt Creator',
       subtitle: 'Powered by Grok AI',
       description: 'Beschreibe deine Idee und lass Grok professionelle Prompts generieren',
-      icon: '🤖',
+      icon: Wand2,
       color: '#d97706',
-      available: false // Noch nicht implementiert
+      available: true
     }
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center bg-white backdrop-blur-sm p-4 rounded-2xl border shadow-sm">
-            <Link 
-              href="/dashboard" 
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              <span>←</span>
-              <span>Dashboard</span>
-            </Link>
-            
-            <div className="text-center">
-              <h1 className="text-xl font-bold">🍌 Generation Modi</h1>
-              <p className="text-sm text-gray-600">nano banana ecosystem</p>
-            </div>
-            
-            <div className="w-20"></div>
-          </div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'hsl(var(--background))',
+      padding: '16px',
+      color: 'hsl(var(--foreground))'
+    }}>
+      {/* Header */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        marginBottom: '24px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'hsl(var(--card))',
+          backdropFilter: 'blur(20px)',
+          padding: '12px 16px',
+          borderRadius: '16px',
+          border: '1px solid hsl(var(--border))',
+          ...(!isMobile && { padding: '16px 20px' })
+        }}>
+          <Link 
+            href="/dashboard" 
+            style={{ 
+              color: 'hsl(var(--foreground))',
+              textDecoration: 'none',
+              fontSize: '13px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.3s ease',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              ...(!isMobile && { fontSize: '14px', gap: '8px', padding: '6px 12px' })
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'hsl(var(--muted) / 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            <ArrowLeft size={14} />
+            Dashboard
+          </Link>
+          
+          <Link 
+            href="/community-prompts"
+            style={{ 
+              color: 'hsl(var(--foreground))',
+              textDecoration: 'none',
+              fontSize: '13px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.3s ease',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              ...(!isMobile && { fontSize: '14px', gap: '8px', padding: '6px 12px' })
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'hsl(var(--muted) / 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            <Sparkles size={14} />
+            Community Prompts
+          </Link>
         </div>
+      </div>
 
-        {/* Username Display */}
-        {user && (
-          <div className="text-center mb-6">
-            <div className="inline-block bg-white px-4 py-2 rounded-full border shadow-sm">
-              <span className="text-sm text-gray-600">Angemeldet als </span>
-              <span className="font-medium text-gray-900">{user.username}</span>
-            </div>
-          </div>
-        )}
+      {/* Title Section */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        textAlign: 'center',
+        marginBottom: '32px',
+        ...(!isMobile && { marginBottom: '40px' })
+      }}>
+        <h1 style={{
+          margin: '0 0 10px 0',
+          fontSize: '24px',
+          fontWeight: '700',
+          background: 'linear-gradient(135deg, hsl(47 100% 65%), hsl(280 70% 60%))',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontFamily: "'Space Grotesk', sans-serif",
+          letterSpacing: '-0.5px',
+          ...(!isMobile && { fontSize: '36px', marginBottom: '12px' })
+        }}>
+          🍌 nano banana pro
+        </h1>
+        <p style={{
+          margin: 0,
+          fontSize: '14px',
+          color: 'hsl(var(--muted-foreground))',
+          fontWeight: '400',
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'italic',
+          ...(!isMobile && { fontSize: '20px' })
+        }}>
+          Was willst du heute machen?
+        </p>
+      </div>
 
-        {/* Generation Modes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {generationModes.map((mode) => (
-            <div key={mode.id}>
+      {/* Generation Modes Grid */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: '16px',
+        ...(!isMobile && {
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '24px'
+        })
+      }}>
+        {generationModes.map((mode) => {
+          const IconComponent = mode.icon
+          return (
+            <div key={mode.id} style={{ position: 'relative' }}>
               {mode.available ? (
-                <Link href={mode.path}>
-                  <div 
-                    className="bg-white p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-                    style={{
-                      borderLeftColor: mode.color,
-                      borderLeftWidth: '4px'
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                          style={{
-                            backgroundColor: `${mode.color}20`,
-                            color: mode.color
-                          }}
-                        >
-                          {mode.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900">{mode.title}</h3>
-                          <p className="text-sm text-gray-600">{mode.subtitle}</p>
-                        </div>
-                      </div>
-                      <div className="text-gray-400">
-                        →
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-700 text-sm">
-                      {mode.description}
-                    </p>
-                    
-                    <div className="mt-4 pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span className="text-xs text-gray-500 uppercase font-medium">Verfügbar</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <div 
-                  className="bg-gray-50 p-6 rounded-2xl border border-gray-200 opacity-60 cursor-not-allowed"
+                <Link
+                  href={mode.path}
                   style={{
-                    borderLeftColor: '#e5e7eb',
-                    borderLeftWidth: '4px'
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    background: mode.color + 'B3',
+                    borderRadius: '16px',
+                    padding: isMobile ? '14px 16px' : '18px 20px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid hsl(var(--border) / 0.3)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    gap: '12px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
                   }}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gray-200 flex items-center justify-center text-2xl text-gray-400">
-                        {mode.icon}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-500">{mode.title}</h3>
-                        <p className="text-sm text-gray-400">{mode.subtitle}</p>
-                      </div>
-                    </div>
-                    <div className="text-gray-300">
-                      ⏳
+                  {/* Icon */}
+                  <div style={{
+                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))',
+                    backdropFilter: 'blur(15px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    borderRadius: '12px',
+                    width: isMobile ? '36px' : '44px',
+                    height: isMobile ? '36px' : '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    {mode.id === 'prompt-creator' ? (
+                      <img src="/grok.svg" alt="Grok" style={{
+                        height: isMobile ? '20px' : '24px',
+                        width: 'auto',
+                        maxWidth: isMobile ? '28px' : '32px',
+                        objectFit: 'contain'
+                      }} />
+                    ) : (
+                      <IconComponent size={isMobile ? 20 : 24} color="black" strokeWidth={2} />
+                    )}
+                  </div>
+                  
+                  {/* Text Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{
+                      margin: '0 0 4px 0',
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '700',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      lineHeight: '1.2'
+                    }}>
+                      {mode.title}
+                    </h3>
+                    <p style={{
+                      margin: 0,
+                      fontSize: isMobile ? '12px' : '13px',
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      fontWeight: '500',
+                      lineHeight: '1.3'
+                    }}>
+                      {mode.subtitle}
+                    </p>
+                  </div>
+                  
+                  {mode.id === 'model-generation' && (
+                    <span style={{ fontSize: isMobile ? '20px' : '24px', flexShrink: 0 }}>🍌</span>
+                  )}
+                </Link>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'hsl(var(--muted) / 0.3)',
+                    borderRadius: '20px',
+                    padding: isMobile ? '20px' : '24px',
+                    boxShadow: '0 8px 24px hsl(var(--background) / 0.1)',
+                    border: '1px solid hsl(var(--border))',
+                    cursor: 'not-allowed',
+                    overflow: 'hidden',
+                    opacity: 0.6,
+                    filter: 'grayscale(50%)'
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px'
+                  }}>
+                    <div style={{
+                      background: 'hsl(var(--muted) / 0.5)',
+                      borderRadius: '12px',
+                      padding: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <IconComponent size={isMobile ? 24 : 28} color="hsl(var(--muted-foreground))" strokeWidth={2} />
                     </div>
                   </div>
                   
-                  <p className="text-gray-500 text-sm">
-                    {mode.description}
-                  </p>
-                  
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-orange-400"></div>
-                      <span className="text-xs text-gray-400 uppercase font-medium">Bald verfügbar</span>
-                    </div>
+                  <div>
+                    <h3 style={{
+                      margin: '0 0 6px 0',
+                      fontSize: isMobile ? '20px' : '22px',
+                      fontWeight: '700',
+                      color: 'hsl(var(--foreground))',
+                      lineHeight: '1.2'
+                    }}>
+                      {mode.title}
+                    </h3>
+                    <p style={{
+                      margin: 0,
+                      fontSize: isMobile ? '13px' : '14px',
+                      color: 'hsl(var(--muted-foreground))',
+                      fontWeight: '500'
+                    }}>
+                      {mode.subtitle}
+                    </p>
                   </div>
                 </div>
               )}
             </div>
-          ))}
-        </div>
-
-        {/* Footer Info */}
-        <div className="mt-8 text-center">
-          <div className="bg-white p-4 rounded-xl border shadow-sm">
-            <p className="text-sm text-gray-600">
-              🚀 <strong>V2 Migration in Progress</strong> - Alle Modi werden 1:1 von V1 kopiert
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Deine V1 Settings und Face-Bilder sind bereits verfügbar
-            </p>
-          </div>
-        </div>
-
+          )
+        })}
       </div>
+
     </div>
   )
 }
