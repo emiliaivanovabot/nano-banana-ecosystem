@@ -162,7 +162,7 @@ export default function CollabPage() {
   ]
 
   // V1 Template Selection
-  const insertPromptTemplate = (template, categoryIndex, promptIndex) => {
+  const insertPromptTemplate = (template: string, categoryIndex: number, promptIndex: number) => {
     setPrompt(template)
     setSelectedTemplate(`${categoryIndex}-${promptIndex}`)
   }
