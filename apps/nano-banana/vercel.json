@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "name": "nano-banana",
+  "buildCommand": "cd ../.. && npx turbo build --filter=nano-banana",
+  "installCommand": "cd ../.. && npm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "regions": ["fra1"],
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

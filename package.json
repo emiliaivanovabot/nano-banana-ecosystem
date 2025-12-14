@@ -9,10 +9,12 @@
     "build": "turbo run build",
     "build:platform": "turbo run build --filter=platform",
     "build:seedream": "turbo run build --filter=seedream",
+    "build:nano-banana": "turbo run build --filter=nano-banana",
     "dev": "turbo run dev",
     "dev:all": "turbo run dev --parallel",
     "dev:core": "turbo run dev --filter='platform' --filter='seedream' --parallel",
     "dev:minimal": "turbo run dev --filter='platform'",
+    "dev:nano-banana": "turbo run dev --filter=nano-banana",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
@@ -28,6 +30,8 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "lucide-react": "^0.561.0"
+    "dlv": "^1.1.3",
+    "lucide-react": "^0.561.0",
+    "object-hash": "^3.0.0"
   }
 }

@@ -4,20 +4,28 @@ import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@repo/auth-config'
 
+interface UserSettings {
+  age_range?: string;
+  hair_color?: string;
+  eye_color?: string;
+  skin_tone?: string;
+  main_face_image_url?: string;
+}
+
 export default function NanoBananaPage() {
   // V1 State Management - EXACT REPLICATION
   const { user } = useAuth()
-  const [userSettings, setUserSettings] = useState(null)
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null)
   const [prompt, setPrompt] = useState('')
-  const [images, setImages] = useState([])
+  const [images, setImages] = useState<string[]>([])
   const [userGender, setUserGender] = useState('female')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState<any>(null)
   const [resolution, setResolution] = useState('2K')
   const [aspectRatio, setAspectRatio] = useState('9:16')
   const [showMainFaceImage, setShowMainFaceImage] = useState(true)
-  const [generationTime, setGenerationTime] = useState(null)
-  const [selectedTemplate, setSelectedTemplate] = useState(null)
+  const [generationTime, setGenerationTime] = useState<number | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [templatesCollapsed, setTemplatesCollapsed] = useState(true)
   const [showPersonalization, setShowPersonalization] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
@@ -125,7 +133,7 @@ export default function NanoBananaPage() {
   }, [user?.id])
 
   // Save personal appearance text to database - V1 EXACT
-  const savePersonalAppearanceText = async (newText) => {
+  const savePersonalAppearanceText = async (newText: string) => {
     if (!user?.id) return
 
     try {
@@ -182,7 +190,7 @@ export default function NanoBananaPage() {
   ]
 
   // V1 Template Selection
-  const insertPromptTemplate = (template, categoryIndex, promptIndex) => {
+  const insertPromptTemplate = (template: string, categoryIndex: number, promptIndex: number) => {
     setPrompt(template)
     setSelectedTemplate(`${categoryIndex}-${promptIndex}`)
   }
