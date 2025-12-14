@@ -273,9 +273,9 @@ export default function CollabPage() {
         try {
           const response = await fetch(userSettings.main_face_image_url)
           const blob = await response.blob()
-          const base64Data = await new Promise((resolve) => {
+          const base64Data = await new Promise<string>((resolve) => {
             const reader = new FileReader()
-            reader.onload = () => resolve(reader.result)
+            reader.onload = () => resolve(reader.result as string)
             reader.readAsDataURL(blob)
           })
           
