@@ -63,6 +63,57 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST - Update user settings (individual field updates)
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { userId, ...updateFields } = body
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = createServerSupabaseClient()
+    
+    // Build update object with only provided fields
+    const updateData = {
+      ...updateFields,
+      updated_at: new Date().toISOString()
+    }
+
+    // Update user settings in database
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating user settings:', error)
+      return NextResponse.json(
+        { error: 'Failed to update settings' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      settings: data,
+      message: 'Settings updated successfully'
+    })
+  } catch (error) {
+    console.error('Settings update API error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update settings' },
+      { status: 500 }
+    )
+  }
+}
+
 // PUT - Update user settings
 export async function PUT(request: NextRequest) {
   try {
