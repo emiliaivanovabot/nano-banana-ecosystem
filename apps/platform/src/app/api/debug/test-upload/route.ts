@@ -35,7 +35,7 @@ export async function POST() {
         success: false,
         error: 'Upload failed',
         details: uploadError.message,
-        code: uploadError.error || 'unknown'
+        code: uploadError.name || 'unknown'
       })
     }
     
