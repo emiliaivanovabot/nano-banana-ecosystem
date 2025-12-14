@@ -168,8 +168,8 @@ export default function CollabPage() {
   }
 
   // V1 Image Upload Logic - exact copy
-  const handleImageUpload = (e, gender = 'female') => {
-    const files = Array.from(e.target.files)
+  const handleImageUpload = (e: any, gender = 'female') => {
+    const files = Array.from(e.target.files) as File[]
     if (files.length > 14) {
       alert('Maximal 14 Bilder erlaubt')
       return
@@ -181,9 +181,9 @@ export default function CollabPage() {
       files.map(file => {
         return new Promise((resolve) => {
           const reader = new FileReader()
-          reader.onload = (e) => resolve({
+          reader.onload = (e: any) => resolve({
             file: file,
-            base64: e.target.result,
+            base64: e.target?.result,
             name: file.name
           })
           reader.readAsDataURL(file)
@@ -194,7 +194,7 @@ export default function CollabPage() {
     })
   }
 
-  const removeImage = (index) => {
+  const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index))
   }
 
@@ -203,14 +203,14 @@ export default function CollabPage() {
   }
 
   // V1 Collab Partner Upload Logic - exact copy
-  const handleCollabPartnerUpload = (event) => {
+  const handleCollabPartnerUpload = (event: any) => {
     const file = event.target.files[0]
     if (file) {
       const reader = new FileReader()
-      reader.onload = (e) => {
+      reader.onload = (e: any) => {
         setCollabPartnerImage({
           file: file,
-          base64: e.target.result,
+          base64: e.target?.result,
           name: file.name
         })
         setHasCollabPartner(true)
