@@ -182,14 +182,14 @@ export default function NanoBananaPage() {
   ]
 
   // V1 Template Selection
-  const insertPromptTemplate = (template, categoryIndex, promptIndex) => {
+  const insertPromptTemplate = (template: string, categoryIndex: number, promptIndex: number) => {
     setPrompt(template)
     setSelectedTemplate(`${categoryIndex}-${promptIndex}`)
   }
 
   // V1 Image Upload Logic - EXACT COPY
-  const handleImageUpload = (e, gender = 'female') => {
-    const files = Array.from(e.target.files)
+  const handleImageUpload = (e: any, gender = 'female') => {
+    const files = Array.from(e.target.files) as File[]
     if (files.length > 14) {
       alert('Maximal 14 Bilder erlaubt')
       return
@@ -201,9 +201,9 @@ export default function NanoBananaPage() {
       files.map(file => {
         return new Promise((resolve) => {
           const reader = new FileReader()
-          reader.onload = (e) => resolve({
+          reader.onload = (e: any) => resolve({
             file: file,
-            base64: e.target.result,
+            base64: e.target?.result,
             name: file.name
           })
           reader.readAsDataURL(file)
@@ -318,7 +318,7 @@ export default function NanoBananaPage() {
       console.log('🍌 Final prompt:', finalPrompt)
       
       // V1 API Format - EXACT COPY
-      const parts = [
+      const parts: any[] = [
         { text: finalPrompt }
       ]
       
@@ -327,9 +327,9 @@ export default function NanoBananaPage() {
         try {
           const response = await fetch(userSettings.main_face_image_url)
           const blob = await response.blob()
-          const base64Data = await new Promise((resolve) => {
+          const base64Data = await new Promise<string>((resolve) => {
             const reader = new FileReader()
-            reader.onload = () => resolve(reader.result)
+            reader.onload = () => resolve(reader.result as string)
             reader.readAsDataURL(blob)
           })
           
@@ -647,11 +647,11 @@ export default function NanoBananaPage() {
                   height: '36px',
                   flex: '1'
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: any) => {
                   e.target.style.transform = 'scale(1.02)'
                   e.target.style.boxShadow = '0 2px 8px rgba(251, 113, 133, 0.15)'
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: any) => {
                   e.target.style.transform = 'scale(1)'
                   e.target.style.boxShadow = 'none'
                 }}
@@ -686,11 +686,11 @@ export default function NanoBananaPage() {
                   height: '36px',
                   flex: '1'
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: any) => {
                   e.target.style.transform = 'scale(1.02)'
                   e.target.style.boxShadow = '0 2px 8px rgba(251, 113, 133, 0.15)'
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: any) => {
                   e.target.style.transform = 'scale(1)'
                   e.target.style.boxShadow = 'none'
                 }}

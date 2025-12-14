@@ -264,7 +264,7 @@ export default function CollabPage() {
       console.log('🤝 Final collab prompt:', finalPrompt)
       
       // V1 API Format - EXACT COPY
-      const parts = [
+      const parts: any[] = [
         { text: finalPrompt }
       ]
       

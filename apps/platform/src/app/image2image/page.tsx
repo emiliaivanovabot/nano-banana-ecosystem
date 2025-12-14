@@ -92,14 +92,14 @@ export default function Image2ImagePage() {
   ]
 
   // V1 Template Selection
-  const insertPromptTemplate = (template, categoryIndex, promptIndex) => {
+  const insertPromptTemplate = (template: string, categoryIndex: number, promptIndex: number) => {
     setPrompt(template)
     setSelectedTemplate(`${categoryIndex}-${promptIndex}`)
   }
 
   // V1 Image Upload Logic - exact copy
-  const handleImageUpload = (e, gender = 'female') => {
-    const files = Array.from(e.target.files)
+  const handleImageUpload = (e: any, gender = 'female') => {
+    const files = Array.from(e.target.files) as File[]
     if (files.length > 14) {
       alert('Maximal 14 Bilder erlaubt')
       return
@@ -111,9 +111,9 @@ export default function Image2ImagePage() {
       files.map(file => {
         return new Promise((resolve) => {
           const reader = new FileReader()
-          reader.onload = (e) => resolve({
+          reader.onload = (e: any) => resolve({
             file: file,
-            base64: e.target.result,
+            base64: e.target?.result,
             name: file.name
           })
           reader.readAsDataURL(file)
@@ -183,7 +183,7 @@ export default function Image2ImagePage() {
       console.log('🖼️ Starting Image2Image generation...')
       
       // V1 API Format - EXACT COPY
-      const parts = [
+      const parts: any[] = [
         { text: prompt }
       ]
       
@@ -192,9 +192,9 @@ export default function Image2ImagePage() {
         try {
           const response = await fetch(userSettings.main_face_image_url)
           const blob = await response.blob()
-          const base64Data = await new Promise((resolve) => {
+          const base64Data = await new Promise<string>((resolve) => {
             const reader = new FileReader()
-            reader.onload = () => resolve(reader.result)
+            reader.onload = () => resolve(reader.result as string)
             reader.readAsDataURL(blob)
           })
           
