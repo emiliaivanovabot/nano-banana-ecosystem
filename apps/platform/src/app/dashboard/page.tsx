@@ -77,15 +77,15 @@ export default function Dashboard() {
               <div className="flex-nano">
                 <button
                   onClick={() => router.push('/settings')}
-                  className="btn-base btn-blue"
+                  className="btn-base btn-secondary"
                 >
-                  Settings
+                  ⚙️ Settings
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="btn-base btn-error"
+                  className="btn-base btn-red"
                 >
-                  Logout
+                  👋 Logout
                 </button>
               </div>
             </div>
@@ -93,9 +93,9 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="container-nano py-6">
+        <main className="container-nano py-8">
           {/* User Info Card */}
-          <div className="bg-nano-card p-6 mb-6">
+          <div className="bg-nano-card p-8 mb-8">
             <div>
               <h3 className="text-title mb-4">
                 Account Information
@@ -148,9 +148,9 @@ export default function Dashboard() {
           </div>
 
           {/* Apps Grid */}
-          <div className="grid-nano-3 gap-6">
+          <div className="grid-nano-3 gap-8">
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow">
-              <div className="p-6">
+              <div className="p-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">🍌</span>
@@ -186,7 +186,7 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow">
-              <div className="p-6">
+              <div className="p-8">
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">S</span>
