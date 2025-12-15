@@ -1,185 +1,638 @@
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import ReactDOM from 'react-dom'
 import { useAuth } from '@repo/auth-config'
-import RecentImagesHistory from '../components/RecentImagesHistory'
-import { ArrowLeft, User } from 'lucide-react'
+
+interface GalleryImage {
+  id: string
+  username: string  
+  prompt: string
+  result_image_url: string
+  created_at: string
+  generation_type: string
+  original_filename: string
+  status: string
+}
 
 export default function GalleryPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const [userSettings, setUserSettings] = useState<any>(null)
+  const [images, setImages] = useState<GalleryImage[]>([])
+  const [loading, setLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+  const [copySuccess, setCopySuccess] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [showFloatingButton, setShowFloatingButton] = useState(false)
+  // Pool system like inspiration
+  const [imagePool, setImagePool] = useState<GalleryImage[]>([])
+  const [poolExhausted, setPoolExhausted] = useState(false)
+  const [poolIndex, setPoolIndex] = useState(0)
+
+  // Mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Load user settings like nano-banana and inspiration pages
+  const loadUserSettings = async () => {
+    if (!user?.id) return
+    
+    try {
+      console.log('🔍 Loading user settings for:', user.id)
+      const response = await fetch(`/api/user/settings?userId=${user.id}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to load user settings')
+      }
+      
+      const data = await response.json()
+      console.log('📦 Gallery user settings response:', data)
+      
+      if (data.settings) {
+        setUserSettings(data.settings)
+        console.log('✅ Gallery user settings loaded:', data.settings)
+      }
+    } catch (error) {
+      console.error('Error loading user settings:', error)
+    }
+  }
+
+  // Initialize image pool - exactly like inspiration
+  const initializeImagePool = useCallback(async () => {
+    try {
+      setLoading(true)
+      const startTime = performance.now()
+      console.log('🎲 Initializing gallery image pool...')
+      
+      console.log('🖼️ Loading all gallery images for:', userSettings?.username)
+      const response = await fetch(`/api/images/recent?username=${encodeURIComponent(userSettings?.username || '')}&limit=500&offset=0`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to load gallery images')
+      }
+      
+      const { images: fetchedImages } = await response.json()
+      
+      // Keep chronological order (newest first) - no shuffling for gallery
+      const chronologicalPool = [...(fetchedImages || [])]
+      
+      setImagePool(chronologicalPool)
+      setPoolIndex(0)
+      setPoolExhausted(false)
+      
+      const totalTime = performance.now() - startTime
+      console.log(`🚀 Gallery Performance Metrics:`)
+      console.log(`  - Pool size: ${chronologicalPool.length} images`)
+      console.log(`  - Total initialization: ${totalTime.toFixed(2)}ms`)
+      
+      // Load first page from pool
+      const firstPageImages = chronologicalPool.slice(0, 30)
+      setImages(firstPageImages)
+      setPoolIndex(30)
+      setHasMore(chronologicalPool.length > 30)
+      
+    } catch (error) {
+      console.error('❌ Error initializing gallery image pool:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [userSettings?.username])
+
+  const loadMoreFromPool = useCallback(() => {
+    if (poolExhausted || loading) return
+    
+    setLoading(true)
+    console.log('🔄 Loading more from gallery pool, index:', poolIndex)
+    
+    const itemsPerPage = 30
+    const nextImages = imagePool.slice(poolIndex, poolIndex + itemsPerPage)
+    
+    if (nextImages.length > 0) {
+      setImages(prev => [...prev, ...nextImages])
+      setPoolIndex(prev => prev + itemsPerPage)
+      
+      // Check if we're near pool exhaustion
+      const remainingImages = imagePool.length - (poolIndex + itemsPerPage)
+      if (remainingImages <= 60) {
+        console.log('⚠️ Gallery pool nearly exhausted...')
+        setHasMore(false)
+        setPoolExhausted(true)
+      }
+    } else {
+      setHasMore(false)
+      setPoolExhausted(true)
+    }
+    
+    setLoading(false)
+  }, [imagePool, poolIndex, poolExhausted, loading])
+
+  const refreshPool = useCallback(async () => {
+    console.log('🔄 Refreshing gallery pool...')
+    await initializeImagePool()
+  }, [initializeImagePool])
+
+  // Load user settings when user changes
+  useEffect(() => {
+    if (user?.id && !userSettings) {
+      loadUserSettings()
+    }
+  }, [user?.id, userSettings])
+
+  // Load images when userSettings changes
+  useEffect(() => {
+    if (!authLoading && userSettings?.username && imagePool.length === 0) {
+      console.log('🖼️ Gallery user settings ready, loading images...')
+      initializeImagePool()
+    }
+  }, [authLoading, userSettings?.username, imagePool.length, initializeImagePool])
+
+  // Infinite scrolling - exactly like inspiration
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastImageElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return
+    if (observerRef.current) observerRef.current.disconnect()
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        console.log('🔄 Loading more gallery images from pool...')
+        loadMoreFromPool()
+      }
+    })
+    if (node) observerRef.current.observe(node)
+  }, [loading, hasMore, loadMoreFromPool])
+
+  // Floating back button scroll logic
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      setShowFloatingButton(scrollY > 100)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // No filtering needed - just use all images
+  const filteredImages = images
+
+  // Image handlers
+  const handleImageClick = (image: GalleryImage) => {
+    setSelectedImage(image)
+    document.body.style.overflow = 'hidden'
+  }
+
+  const closeModal = () => {
+    setSelectedImage(null)
+    setIsFullscreen(false)
+    document.body.style.overflow = 'unset'
+  }
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen)
+  }
+
+  const copyPrompt = (prompt: string) => {
+    navigator.clipboard.writeText(prompt).then(() => {
+      console.log('✅ Prompt copied to clipboard')
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
+    }).catch(err => {
+      console.error('❌ Failed to copy prompt:', err)
+    })
+  }
+
+  const getImageNumber = (filename: string, generationType: string) => {
+    if (!filename || generationType === 'single') return null
+    
+    // Extract number from filename like "nano-banana-4x-3-1764109853661.webp"
+    const match = filename.match(/nano-banana-\w+-(\d+)-\d+\.(webp|jpg|png|avif)/)
+    if (match) {
+      const imageNum = parseInt(match[1])
+      const total = generationType === '4x' ? 4 : 10
+      return { current: imageNum, total }
+    }
+    return null
+  }
+
+  // No filters needed
 
   return (
-    <div style={{
+    <div style={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '24px',
-      color: 'white'
+      background: 'hsl(var(--background))',
+      padding: '20px',
+      color: 'hsl(var(--foreground))',
+      WebkitOverflowScrolling: 'touch',
+      overscrollBehavior: 'contain'
     }}>
-      {/* Header */}
+      {/* FLOATING BACK BUTTON WHEN SCROLLING */}
+      {showFloatingButton && ReactDOM.createPortal(
+        <a 
+          href="/nano-banana" 
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '20px',
+            zIndex: 10000,
+            display: 'inline-flex',
+            alignItems: 'center',
+            textDecoration: 'none',
+            fontSize: '0.9rem',
+            background: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(16px)',
+            color: 'rgba(255, 255, 255, 0.95)',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.15)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          ← Zurück
+        </a>,
+        document.body
+      )}
+
+      {/* Header - Optimized spacing like inspiration */}
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        marginBottom: '24px'
+        marginBottom: '16px'
       }}>
         <div style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center',
-          background: 'rgba(255, 255, 255, 0.1)',
+          background: 'hsl(var(--card))',
           backdropFilter: 'blur(20px)',
-          padding: '12px 20px',
+          padding: '12px 16px',
           borderRadius: '16px',
-          border: '1px solid rgba(255, 255, 255, 0.2)'
+          border: '1px solid hsl(var(--border))',
         }}>
-          <Link 
-            href="/dashboard"
-            style={{
-              color: 'white',
+          <a 
+            href="/nano-banana"
+            style={{ 
+              color: 'hsl(var(--foreground))',
               textDecoration: 'none',
+              fontSize: '13px',
+              fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              padding: '6px 12px',
+              gap: '6px',
+              transition: 'all 0.3s ease',
+              padding: '6px 10px',
               borderRadius: '8px',
-              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+              e.currentTarget.style.background = 'hsl(var(--muted) / 0.3)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <ArrowLeft size={16} />
-            Dashboard
-          </Link>
-          
-          <div style={{
-            textAlign: 'center'
-          }}>
-            <h1 style={{
-              margin: 0,
-              fontSize: '24px',
-              fontWeight: '700',
-              background: 'linear-gradient(135deg, #FFD700, #FFA500)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              📸 Deine Gallery
-            </h1>
-            <p style={{
-              margin: 0,
-              fontSize: '12px',
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontStyle: 'italic'
-            }}>
-              Alle deine generierten Bilder
-            </p>
-          </div>
-          
-          <div style={{ width: '80px' }} />
+            ← Zurück
+          </a>
         </div>
       </div>
 
-      {/* User Info */}
-      {user && (
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto 24px auto'
-        }}>
+      {/* Title Section - Compact like inspiration */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto 20px auto',
+        background: 'hsl(var(--card))',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '16px',
+        padding: '20px',
+        border: '1px solid hsl(var(--border))'
+      }}>
+        <div>
+          <h1 style={{ 
+            margin: '0 0 8px 0', 
+            fontSize: isMobile ? '28px' : '32px', 
+            fontWeight: '700', 
+            color: 'hsl(47 100% 65%)',
+            background: 'linear-gradient(135deg, hsl(47 100% 65%), hsl(280 70% 60%))',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Meine Bilder
+          </h1>
+          <p style={{ 
+            margin: 0, 
+            fontSize: '14px', 
+            color: 'hsl(var(--muted-foreground))' 
+          }}>
+            Alle deine generierten Bilder auf einen Blick
+          </p>
+        </div>
+
+        {/* No filter buttons needed */}
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {loading ? (
           <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(15px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            borderRadius: '16px',
-            padding: '16px 20px',
+            background: 'hsl(var(--card))',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '60px',
+            textAlign: 'center',
+            border: '1px solid hsl(var(--border))'
+          }}>
+            <p style={{ color: 'hsl(var(--foreground))', margin: 0, fontSize: '18px' }}>
+              Lade Bilder...
+            </p>
+          </div>
+        ) : filteredImages.length === 0 ? (
+          <div style={{
+            background: 'hsl(var(--card))',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '60px',
+            textAlign: 'center',
+            border: '1px solid hsl(var(--border))'
+          }}>
+            <h2 style={{ color: 'hsl(var(--foreground))', margin: '0 0 16px 0', fontSize: '20px' }}>
+              Keine Bilder gefunden
+            </h2>
+            <p style={{ 
+              color: 'hsl(var(--muted-foreground))', 
+              margin: '0 0 24px 0',
+              fontSize: '16px' 
+            }}>
+              Du hast noch keine Bilder generiert.
+            </p>
+            <a 
+              href="/nano-banana"
+              style={{
+                display: 'inline-block',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, hsl(47 100% 65%), hsl(280 70% 60%))',
+                color: 'hsl(var(--primary-foreground))',
+                textDecoration: 'none',
+                borderRadius: '12px',
+                fontWeight: '600',
+                fontSize: '14px'
+              }}
+            >
+              Erstes Bild generieren
+            </a>
+          </div>
+        ) : (
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)',
+              gap: '2px',
+              marginBottom: '40px',
+              transform: 'translate3d(0, 0, 0)',
+              WebkitBackfaceVisibility: 'hidden',
+              WebkitPerspective: '1000',
+              WebkitTransform: 'translate3d(0, 0, 0)',
+            }}
+          >
+            {filteredImages.map((image, index) => {
+              if (!image || !image.id) return null
+              
+              const isLast = filteredImages.length === index + 1
+
+              return (
+                <div
+                  key={image.id}
+                  ref={isLast ? lastImageElementRef : null}
+                  onClick={() => handleImageClick(image)}
+                  style={{
+                    aspectRatio: '1',
+                    cursor: 'pointer',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    transform: 'translateZ(0)',
+                    backfaceVisibility: 'hidden'
+                  }}
+                >
+                  <img
+                    src={image.result_image_url}
+                    alt={`Generated image ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }}
+                    loading="lazy"
+                  />
+                  
+                  {/* Image Number Overlay */}
+                  {(() => {
+                    const imageNumber = getImageNumber(image.original_filename, image.generation_type);
+                    return imageNumber ? (
+                      <div style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        background: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: '500'
+                      }}>
+                        {imageNumber.current}/{imageNumber.total}
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )
+            })}
+          </div>
+        )}
+        
+        {/* Pool exhausted handling like inspiration */}
+        {!hasMore && images.length > 0 && (
+          <div style={{
+            background: 'hsl(var(--card))',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '20px',
+            textAlign: 'center',
+            border: '1px solid hsl(var(--border))',
+            margin: '20px auto',
+            maxWidth: '1200px'
+          }}>
+            {poolExhausted ? (
+              <>
+                <p style={{ color: 'hsl(var(--foreground))', margin: '0 0 15px 0' }}>
+                  Du hast alle deine Bilder gesehen! 🎨
+                </p>
+                <button 
+                  onClick={refreshPool}
+                  disabled={loading}
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(47 100% 65%), hsl(280 70% 60%))',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '12px 24px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    opacity: loading ? 0.6 : 1
+                  }}
+                >
+                  {loading ? 'Lade neue Reihenfolge...' : 'Neue zufällige Reihenfolge 🎲'}
+                </button>
+              </>
+            ) : (
+              <p style={{ color: 'hsl(var(--foreground))', margin: 0 }}>
+                Du hast alle deine Bilder gesehen! 🎨
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {selectedImage && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.9)',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
-          }}>
-            <User size={20} />
-            <span style={{ fontSize: '16px', fontWeight: '500' }}>
-              {user.username}'s Gallery
-            </span>
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          onClick={closeModal}
+        >
+          <div 
+            style={{
+              background: 'hsl(var(--card))',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={closeModal}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: 'hsl(var(--foreground))'
+              }}
+            >
+              ✖
+            </button>
+            
+            <img 
+              src={selectedImage.result_image_url} 
+              alt="Selected image"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain',
+                borderRadius: '8px',
+                marginBottom: '16px'
+              }}
+              onClick={toggleFullscreen}
+            />
+            
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ 
+                margin: '0 0 8px 0',
+                fontSize: '14px',
+                color: 'hsl(var(--muted-foreground))'
+              }}>
+                {new Date(selectedImage.created_at).toLocaleString('de-DE')} • {selectedImage.generation_type}
+              </p>
+              {selectedImage.prompt && (
+                <p style={{ 
+                  margin: 0,
+                  fontSize: '16px',
+                  color: 'hsl(var(--foreground))'
+                }}>
+                  <strong>Prompt:</strong> {selectedImage.prompt}
+                </p>
+              )}
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              flexWrap: 'wrap'
+            }}>
+              <button 
+                onClick={() => window.open(selectedImage.result_image_url, '_blank')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Bild öffnen
+              </button>
+              
+              {selectedImage.prompt && (
+                <button 
+                  onClick={() => copyPrompt(selectedImage.prompt)}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'hsl(var(--secondary))',
+                    color: 'hsl(var(--secondary-foreground))',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  {copySuccess ? '✅ Kopiert!' : 'Prompt kopieren'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
-
-      {/* Full Gallery */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(15px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '20px',
-          padding: '24px'
-        }}>
-          <RecentImagesHistory currentUser={user} />
-        </div>
-      </div>
-
-      {/* Navigation Links */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '24px auto 0 auto',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <Link 
-            href="/inspiration"
-            style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              fontSize: '14px',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-            }}
-          >
-            💡 Community Inspiration
-          </Link>
-          
-          <Link 
-            href="/generation-modes"
-            style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              fontSize: '14px',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-            }}
-          >
-            🍌 Neue Bilder generieren
-          </Link>
-        </div>
-      </div>
     </div>
   )
 }
