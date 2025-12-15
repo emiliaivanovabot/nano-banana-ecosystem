@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 import { useAuth } from '@repo/auth-config'
+import './gallery.css'
 
 interface GalleryImage {
   id: string
@@ -227,10 +228,13 @@ export default function GalleryPage() {
     <div style={{ 
       minHeight: '100vh',
       background: 'hsl(var(--background))',
-      padding: '20px',
-      color: 'hsl(var(--foreground))',
+      paddingBottom: '40px',
+      transition: 'background-color 0.3s ease',
       WebkitOverflowScrolling: 'touch',
-      overscrollBehavior: 'contain'
+      scrollBehavior: 'smooth',
+      transform: 'translateZ(0)',
+      backfaceVisibility: 'hidden',
+      perspective: '1000px'
     }}>
       {/* FLOATING BACK BUTTON WHEN SCROLLING */}
       {showFloatingButton && ReactDOM.createPortal(
@@ -266,85 +270,32 @@ export default function GalleryPage() {
         document.body
       )}
 
-      {/* Header - Optimized spacing like inspiration */}
+      {/* Header with dark theme */}
       <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        marginBottom: '16px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          background: 'hsl(var(--card))',
-          backdropFilter: 'blur(20px)',
-          padding: '12px 16px',
-          borderRadius: '16px',
-          border: '1px solid hsl(var(--border))',
-        }}>
-          <a 
-            href="/nano-banana"
-            style={{ 
-              color: 'hsl(var(--foreground))',
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.3s ease',
-              padding: '6px 10px',
-              borderRadius: '8px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'hsl(var(--muted) / 0.3)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-            }}
-          >
-            ← Zurück
-          </a>
-        </div>
-      </div>
-
-      {/* Title Section - Compact like inspiration */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto 20px auto',
         background: 'hsl(var(--card))',
         backdropFilter: 'blur(20px)',
-        borderRadius: '16px',
-        padding: '20px',
-        border: '1px solid hsl(var(--border))'
+        borderBottom: '1px solid hsl(var(--border))',
+        padding: '20px 0',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        marginBottom: '0'
       }}>
-        <div>
-          <h1 style={{ 
-            margin: '0 0 8px 0', 
-            fontSize: isMobile ? '28px' : '32px', 
-            fontWeight: '700', 
-            color: 'hsl(47 100% 65%)',
-            background: 'linear-gradient(135deg, hsl(47 100% 65%), hsl(280 70% 60%))',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            Meine Bilder
-          </h1>
-          <p style={{ 
-            margin: 0, 
-            fontSize: '14px', 
-            color: 'hsl(var(--muted-foreground))' 
-          }}>
-            Alle deine generierten Bilder auf einen Blick
-          </p>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 20px'
+        }}>
+          <a href="/nano-banana" className="back-link">
+            ← Zurück zu Nano Banana
+          </a>
+          <div className="title-section">
+            <h1>Meine Galerie</h1>
+            <p className="subtitle">Alle deine generierten Bilder in chronologischer Reihenfolge</p>
+          </div>
         </div>
-
-        {/* No filter buttons needed */}
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
         {loading ? (
           <div style={{
             background: 'hsl(var(--card))',
