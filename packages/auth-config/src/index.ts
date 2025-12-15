@@ -55,16 +55,27 @@ interface AuthProviderProps {
   initialUser?: User | null
 }
 
+// Create singleton Supabase client to avoid multiple instances
+const getSupabaseClient = (() => {
+  let instance: ReturnType<typeof createSupabaseClient> | null = null
+  return () => {
+    if (!instance) {
+      instance = createSupabaseClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey)
+    }
+    return instance
+  }
+})()
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children, initialUser }) => {
   const [user, setUser] = useState<User | null>(initialUser || null)
   const [loading, setLoading] = useState(!initialUser)
-  const supabase = createSupabaseClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey)
+  const supabase = getSupabaseClient()
 
-  // Initialize V1 auth state
+  // Initialize V1 auth state (stable session management like V1)
   useEffect(() => {
     let mounted = true
 
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       try {
         // If we have an initialUser from server-side, use it and store it
         if (initialUser && mounted) {
@@ -74,13 +85,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, initialUse
           return
         }
 
-        // Fallback: check for stored V1 user session
+        // Check for stored V1 user session (like V1 SessionManager.getSession())
         const storedUser = localStorage.getItem('v1_user')
         
         if (mounted && storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser)
             setUser(parsedUser)
+            console.log('✅ Restored user session:', parsedUser.username)
             if (mounted) setLoading(false)
             return
           } catch (e) {
@@ -88,25 +100,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, initialUse
             localStorage.removeItem('v1_user')
           }
         }
-
-        // Final fallback: check Supabase session (client-side)
-        const { data: { session } } = await supabase.auth.getSession()
         
-        if (session?.user && mounted) {
-          // Fetch user profile from users table
-          const { data: userProfile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          if (userProfile) {
-            setUser(userProfile)
-            // Store for next time
-            localStorage.setItem('v1_user', JSON.stringify(userProfile))
-          }
-        }
-        
+        // No session found
         if (mounted) {
           setLoading(false)
         }
@@ -118,33 +113,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, initialUse
       }
     }
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return
-
-        if (event === 'SIGNED_OUT' || !session) {
-          setUser(null)
-        } else if (session?.user) {
-          // Fetch user profile data
-          const { data: userProfile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          setUser(userProfile)
-        }
-        
-        setLoading(false)
-      }
-    )
-
     initializeAuth()
 
     return () => {
       mounted = false
-      subscription?.unsubscribe()
     }
   }, [initialUser])
 

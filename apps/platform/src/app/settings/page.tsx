@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@repo/auth-config'
 import { V1User } from '@repo/database'
+import '@nano-banana/ui-components'
+import { BackButton } from '@nano-banana/ui-components'
 
 // V1 User Settings Interface (exact replication)
 interface UserSettings {
@@ -96,7 +98,9 @@ export default function SettingsPage() {
   }, [canNavigateAway, hasUnsavedChanges])
 
   useEffect(() => {
+    console.log('🔍 Settings useEffect:', { user: !!user, authLoading, userExists: !!user })
     if (!authLoading && !user) {
+      console.log('🚨 Settings redirecting to login - no user found')
       router.push('/login')
       return
     }
@@ -234,530 +238,545 @@ export default function SettingsPage() {
   const v1User = user as V1User
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-layout">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">
-                User Settings
-              </h1>
-              <p className="text-sm text-gray-500">Configure your Nano Banana settings</p>
+      <header className="bg-nano-header">
+        <div className="container-nano">
+          <div className="flex-between py-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-4">
+                <BackButton href="/dashboard" />
+                <div>
+                  <h1 className="title-large">
+                    Einstellungen
+                  </h1>
+                  <p className="subtitle">Konfiguriere deine Nano Banana Einstellungen</p>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Back to Dashboard
-            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="container-nano py-8">
         {/* Status Messages */}
         {message && (
-          <div className={`mb-6 p-4 rounded-md ${
-            message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          <div className={`mb-6 p-4 rounded-lg ${
+            message.type === 'success' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'
           }`}>
             {message.text}
-            {isAutoSaving && <span className="ml-2">Saving...</span>}
+            {isAutoSaving && <span className="ml-2">Speichert...</span>}
           </div>
         )}
 
         {/* Account Information */}
-        <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Account & API Configuration
-            </h3>
+        <div className="bg-nano-card p-6 shadow-xl mb-6">
+          <h3 className="text-title-large text-white mb-4">
+            Account & API Konfiguration
+          </h3>
             
-            <div className="space-y-4">
-              {/* Username (Read-only) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={userSettings.username}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500"
-                />
-              </div>
+          <div className="space-y-4">
+            {/* Username (Read-only) */}
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-slate-300 min-w-[80px]">Username:</label>
+              <input
+                type="text"
+                value={userSettings.username}
+                disabled
+                className="flex-1 px-3 py-2 border border-slate-600 rounded-md shadow-sm bg-slate-700/50 text-slate-400 focus:outline-none"
+              />
+            </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email <span className="text-sm text-gray-500 font-normal">(optional)</span>
-                </label>
-                <input
-                  type="email"
-                  value={userSettings.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="your.email@example.com"
-                />
-              </div>
+            {/* Email */}
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-slate-300 min-w-[80px]">
+                Email:
+              </label>
+              <input
+                type="email"
+                value={userSettings.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="flex-1 px-3 py-2 border border-slate-600 rounded-md shadow-sm bg-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                placeholder="(optional)"
+              />
+            </div>
 
-              {/* Gemini API Key */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Gemini API Key <span className="text-red-500">*</span>
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    type={showApiKey ? 'text' : 'password'}
-                    value={userSettings.gemini_api_key}
-                    onChange={(e) => handleInputChange('gemini_api_key', e.target.value)}
-                    className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="AIza..."
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    <span className="text-gray-400 text-sm">
-                      {showApiKey ? 'Hide' : 'Show'}
-                    </span>
-                  </button>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  Required for image generation. Get your key from Google AI Studio.
-                </p>
+            {/* Gemini API Key */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Gemini API Key <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value={userSettings.gemini_api_key}
+                  onChange={(e) => handleInputChange('gemini_api_key', e.target.value)}
+                  className="block w-full px-3 py-2 pr-16 border border-slate-600 rounded-md shadow-sm bg-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                  placeholder="AIza..."
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 text-sm"
+                >
+                  {showApiKey ? 'Verbergen' : 'Anzeigen'}
+                </button>
               </div>
+              <p className="mt-1 text-sm text-slate-400">
+                Erforderlich für Bildgenerierung. Hole deinen Key von Google AI Studio.
+              </p>
+            </div>
+
+            {/* Seedream API Key */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Seedream API Key <span className="text-slate-500">(optional)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value=""
+                  className="block w-full px-3 py-2 pr-16 border border-slate-600 rounded-md shadow-sm bg-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                  placeholder="Seedream API Key..."
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-300 text-sm"
+                >
+                  {showApiKey ? 'Verbergen' : 'Anzeigen'}
+                </button>
+              </div>
+              <p className="mt-1 text-sm text-slate-400">
+                Optional für Seedream Bildgenerierung.
+              </p>
             </div>
           </div>
         </div>
 
         {/* Face Images Section */}
-        <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Face Images
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Upload up to 3 face images for personalized generation
-            </p>
+        <div className="bg-nano-card p-6 shadow-xl mb-6">
+          <h3 className="text-title-large text-white mb-4">
+            Gesichts-Bilder
+          </h3>
+          <p className="text-sm text-slate-400 mb-6">
+            Lade bis zu 3 Gesichtsbilder für personalisierte Generierung hoch
+          </p>
+          
+          <div className="grid grid-cols-3 gap-4">
+            {/* Main Face */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Haupt-Gesicht
+              </label>
+              {userSettings.main_face_image_url && userSettings.main_face_image_url.length > 0 ? (
+                <div className="relative group">
+                  <img 
+                    src={decodeURIComponent(userSettings.main_face_image_url)} 
+                    alt="Main face"
+                    className="w-full aspect-square object-cover rounded-md border border-slate-600"
+                  />
+                  <button
+                    onClick={() => handleInputChange('main_face_image_url', '')}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => document.getElementById('main_face_input').click()}
+                  className="w-full aspect-square border-2 border-dashed border-slate-600 rounded-md text-center cursor-pointer hover:border-slate-500 transition-colors bg-slate-800/50 flex flex-col items-center justify-center"
+                >
+                  <svg
+                    className="h-8 w-8 text-slate-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <div className="text-xs text-slate-400">
+                    Upload
+                  </div>
+                </button>
+              )}
+              <input
+                id="main_face_input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file || !user?.id) return
+                  
+                  try {
+                    const formData = new FormData()
+                    formData.append('file', file)
+                    formData.append('section', 'main_face')
+                    formData.append('userId', user.id)
+                    
+                    const response = await fetch('/api/user/upload-image', {
+                      method: 'POST',
+                      body: formData
+                    })
+                    
+                    const result = await response.json()
+                    
+                    if (response.ok) {
+                      handleInputChange('main_face_image_url', result.imageUrl)
+                    }
+                  } catch (error) {
+                    console.error('Upload failed:', error)
+                  }
+                }}
+              />
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Main Face */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Main Face
-                </label>
-                {userSettings.main_face_image_url && userSettings.main_face_image_url.length > 0 ? (
-                  <div>
-                    <img 
-                      src={decodeURIComponent(userSettings.main_face_image_url)} 
-                      alt="Main face"
-                      className="w-full h-32 object-cover rounded-md border border-gray-300 mb-2"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => document.getElementById('main_face_input').click()}
-                        disabled={isAutoSaving}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
-                      >
-                        Replace
-                      </button>
-                      <button
-                        onClick={() => handleInputChange('main_face_image_url', '')}
-                        disabled={isAutoSaving}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div 
-                    onClick={() => document.getElementById('main_face_input').click()}
-                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+            {/* Face 2 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Gesicht 2
+              </label>
+              {userSettings.face_2_image_url && userSettings.face_2_image_url.length > 0 ? (
+                <div className="relative group">
+                  <img 
+                    src={decodeURIComponent(userSettings.face_2_image_url)} 
+                    alt="Face 2"
+                    className="w-full aspect-square object-cover rounded-md border border-slate-600"
+                  />
+                  <button
+                    onClick={() => handleInputChange('face_2_image_url', '')}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg
-                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 48 48"
-                    >
-                      <path
-                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <div className="text-sm text-gray-600">
-                      Click to upload main face
-                    </div>
-                  </div>
-                )}
-                <input
-                  id="main_face_input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0]
-                    if (!file || !user?.id) return
-                    
-                    try {
-                      const formData = new FormData()
-                      formData.append('file', file)
-                      formData.append('section', 'main_face')
-                      formData.append('userId', user.id)
-                      
-                      const response = await fetch('/api/user/upload-image', {
-                        method: 'POST',
-                        body: formData
-                      })
-                      
-                      const result = await response.json()
-                      
-                      if (response.ok) {
-                        handleInputChange('main_face_image_url', result.imageUrl)
-                      }
-                    } catch (error) {
-                      console.error('Upload failed:', error)
-                    }
-                  }}
-                />
-              </div>
-
-              {/* Face 2 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Face 2
-                </label>
-                <input
-                  type="text"
-                  value={userSettings.face_2_name}
-                  onChange={(e) => handleInputChange('face_2_name', e.target.value)}
-                  className="w-full px-3 py-1 mb-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="Face name (optional)"
-                />
-                {userSettings.face_2_image_url && userSettings.face_2_image_url.length > 0 ? (
-                  <div className="relative group">
-                    <img 
-                      src={decodeURIComponent(userSettings.face_2_image_url)} 
-                      alt="Face 2 image"
-                      className="w-full h-32 object-cover rounded-md border border-gray-300"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-md flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
-                        <button
-                          onClick={() => document.getElementById('face_2_input').click()}
-                          disabled={isAutoSaving}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
-                        >
-                          Replace
-                        </button>
-                        <button
-                          onClick={() => handleInputChange('face_2_image_url', '')}
-                          disabled={isAutoSaving}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div 
-                    onClick={() => document.getElementById('face_2_input').click()}
-                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => document.getElementById('face_2_input').click()}
+                  className="w-full aspect-square border-2 border-dashed border-slate-600 rounded-md text-center cursor-pointer hover:border-slate-500 transition-colors bg-slate-800/50 flex flex-col items-center justify-center"
+                >
+                  <svg
+                    className="h-8 w-8 text-slate-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 48 48"
-                    >
-                      <path
-                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <div className="text-sm text-gray-600">
-                      Click to upload face 2
-                    </div>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <div className="text-xs text-slate-400">
+                    Upload
                   </div>
-                )}
-                <input
-                  id="face_2_input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0]
-                    if (!file || !user?.id) return
+                </button>
+              )}
+              <input
+                id="face_2_input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file || !user?.id) return
+                  
+                  try {
+                    const formData = new FormData()
+                    formData.append('file', file)
+                    formData.append('section', 'face_2')
+                    formData.append('userId', user.id)
                     
-                    try {
-                      const formData = new FormData()
-                      formData.append('file', file)
-                      formData.append('section', 'face_2')
-                      formData.append('userId', user.id)
-                      
-                      const response = await fetch('/api/user/upload-image', {
-                        method: 'POST',
-                        body: formData
-                      })
-                      
-                      const result = await response.json()
-                      
-                      if (response.ok) {
-                        handleInputChange('face_2_image_url', result.imageUrl)
-                      }
-                    } catch (error) {
-                      console.error('Upload failed:', error)
+                    const response = await fetch('/api/user/upload-image', {
+                      method: 'POST',
+                      body: formData
+                    })
+                    
+                    const result = await response.json()
+                    
+                    if (response.ok) {
+                      handleInputChange('face_2_image_url', result.imageUrl)
                     }
-                  }}
-                />
-              </div>
-
-              {/* Face 3 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Face 3
-                </label>
-                <input
-                  type="text"
-                  value={userSettings.face_3_name}
-                  onChange={(e) => handleInputChange('face_3_name', e.target.value)}
-                  className="w-full px-3 py-1 mb-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="Face name (optional)"
-                />
-                {userSettings.face_3_image_url && userSettings.face_3_image_url.length > 0 ? (
-                  <div className="relative group">
-                    <img 
-                      src={decodeURIComponent(userSettings.face_3_image_url)} 
-                      alt="Face 3 image"
-                      className="w-full h-32 object-cover rounded-md border border-gray-300"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-md flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
-                        <button
-                          onClick={() => document.getElementById('face_3_input').click()}
-                          disabled={isAutoSaving}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium"
-                        >
-                          Replace
-                        </button>
-                        <button
-                          onClick={() => handleInputChange('face_3_image_url', '')}
-                          disabled={isAutoSaving}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div 
-                    onClick={() => document.getElementById('face_3_input').click()}
-                    className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  } catch (error) {
+                    console.error('Upload failed:', error)
+                  }
+                }}
+              />
+            </div>
+            
+            {/* Face 3 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Gesicht 3
+              </label>
+              {userSettings.face_3_image_url && userSettings.face_3_image_url.length > 0 ? (
+                <div className="relative group">
+                  <img 
+                    src={decodeURIComponent(userSettings.face_3_image_url)} 
+                    alt="Face 3"
+                    className="w-full aspect-square object-cover rounded-md border border-slate-600"
+                  />
+                  <button
+                    onClick={() => handleInputChange('face_3_image_url', '')}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg
-                      className="mx-auto h-8 w-8 text-gray-400 mb-2"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 48 48"
-                    >
-                      <path
-                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <div className="text-sm text-gray-600">
-                      Click to upload face 3
-                    </div>
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => document.getElementById('face_3_input').click()}
+                  className="w-full aspect-square border-2 border-dashed border-slate-600 rounded-md text-center cursor-pointer hover:border-slate-500 transition-colors bg-slate-800/50 flex flex-col items-center justify-center"
+                >
+                  <svg
+                    className="h-8 w-8 text-slate-400 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <div className="text-xs text-slate-400">
+                    Upload
                   </div>
-                )}
-                <input
-                  id="face_3_input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0]
-                    if (!file || !user?.id) return
+                </button>
+              )}
+              <input
+                id="face_3_input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file || !user?.id) return
+                  
+                  try {
+                    const formData = new FormData()
+                    formData.append('file', file)
+                    formData.append('section', 'face_3')
+                    formData.append('userId', user.id)
                     
-                    try {
-                      const formData = new FormData()
-                      formData.append('file', file)
-                      formData.append('section', 'face_3')
-                      formData.append('userId', user.id)
-                      
-                      const response = await fetch('/api/user/upload-image', {
-                        method: 'POST',
-                        body: formData
-                      })
-                      
-                      const result = await response.json()
-                      
-                      if (response.ok) {
-                        handleInputChange('face_3_image_url', result.imageUrl)
-                      }
-                    } catch (error) {
-                      console.error('Upload failed:', error)
+                    const response = await fetch('/api/user/upload-image', {
+                      method: 'POST',
+                      body: formData
+                    })
+                    
+                    const result = await response.json()
+                    
+                    if (response.ok) {
+                      handleInputChange('face_3_image_url', result.imageUrl)
                     }
-                  }}
-                />
-              </div>
+                  } catch (error) {
+                    console.error('Upload failed:', error)
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Personalization Settings */}
-        <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Personalization
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Hair Color */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Hair Color
-                </label>
-                <select
-                  value={userSettings.hair_color}
-                  onChange={(e) => handleInputChange('hair_color', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {HAIR_COLORS.map(color => (
-                    <option key={color} value={color}>
-                      {color || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Eye Color */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Eye Color
-                </label>
-                <select
-                  value={userSettings.eye_color}
-                  onChange={(e) => handleInputChange('eye_color', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {EYE_COLORS.map(color => (
-                    <option key={color} value={color}>
-                      {color || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Skin Tone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Skin Tone
-                </label>
-                <select
-                  value={userSettings.skin_tone}
-                  onChange={(e) => handleInputChange('skin_tone', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {SKIN_TONES.map(tone => (
-                    <option key={tone} value={tone}>
-                      {tone || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Age Range */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Age Range
-                </label>
-                <select
-                  value={userSettings.age_range}
-                  onChange={(e) => handleInputChange('age_range', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {AGE_RANGES.map(range => (
-                    <option key={range} value={range}>
-                      {range || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Generation Defaults */}
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Generation Defaults
+        {/* Personalization and Generation Settings */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Personalization Settings */}
+          <div className="bg-nano-card p-6 shadow-xl">
+            <h3 className="text-title-large text-white mb-4">
+              Physische Eigenschaften <span className="text-sm text-slate-400 font-normal">(für AI-Prompts)</span>
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Default Resolution */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Default Resolution
-                </label>
-                <select
-                  value={userSettings.default_resolution}
-                  onChange={(e) => handleInputChange('default_resolution', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {RESOLUTIONS.map(resolution => (
-                    <option key={resolution} value={resolution}>
-                      {resolution || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-sm text-gray-500">
-                  1K (fast), 2K (balanced), 4K (high quality)
-                </p>
-              </div>
+                {/* Hair Color */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Haarfarbe
+                  </label>
+                  <select
+                    value={userSettings.hair_color || ''}
+                    onChange={(e) => handleInputChange('hair_color', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.hair_color ? 'hsl(47 100% 65%)' : 'hsl(var(--background))',
+                      color: userSettings.hair_color ? '#374151' : 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    {!userSettings.hair_color && <option value="">Wählen...</option>}
+                    <option value="black">Schwarz</option>
+                    <option value="darkbrown">Dunkelbraun</option>
+                    <option value="brunette">Brunette</option>
+                    <option value="blonde">Blond</option>
+                    <option value="red">Rot</option>
+                  </select>
+                </div>
 
-              {/* Default Aspect Ratio */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Default Aspect Ratio
-                </label>
-                <select
-                  value={userSettings.default_aspect_ratio}
-                  onChange={(e) => handleInputChange('default_aspect_ratio', e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {ASPECT_RATIOS.map(ratio => (
-                    <option key={ratio} value={ratio}>
-                      {ratio || 'Not specified'}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-sm text-gray-500">
-                  9:16 (portrait), 16:9 (landscape), 1:1 (square), 4:3 (classic)
-                </p>
-              </div>
+                {/* Eye Color */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Augenfarbe
+                  </label>
+                  <select
+                    value={userSettings.eye_color || ''}
+                    onChange={(e) => handleInputChange('eye_color', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.eye_color ? 'hsl(280 70% 60%)' : 'hsl(var(--background))',
+                      color: 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    {!userSettings.eye_color && <option value="">Wählen...</option>}
+                    <option value="brown">Braun</option>
+                    <option value="blue">Blau</option>
+                    <option value="green">Grün</option>
+                    <option value="gray">Grau</option>
+                    <option value="hazel">Haselnuss</option>
+                  </select>
+                </div>
+
+                {/* Skin Tone */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Hautton
+                  </label>
+                  <select
+                    value={userSettings.skin_tone || ''}
+                    onChange={(e) => handleInputChange('skin_tone', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.skin_tone ? 'hsl(47 100% 65%)' : 'hsl(var(--background))',
+                      color: userSettings.skin_tone ? '#374151' : 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    {!userSettings.skin_tone && <option value="">Wählen...</option>}
+                    <option value="european">Europäisch</option>
+                    <option value="latin">Lateinamerikanisch</option>
+                    <option value="asian">Asiatisch</option>
+                    <option value="african">Afrikanisch</option>
+                    <option value="arabic">Arabisch</option>
+                  </select>
+                </div>
+
+                {/* Age Range */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Altersbereich
+                  </label>
+                  <select
+                    value={userSettings.age_range || ''}
+                    onChange={(e) => handleInputChange('age_range', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.age_range ? 'hsl(280 70% 60%)' : 'hsl(var(--background))',
+                      color: 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    {!userSettings.age_range && <option value="">Wählen...</option>}
+                    <option value="under-20">unter 20</option>
+                    <option value="young-adult">23-27</option>
+                    <option value="adult">28-35</option>
+                    <option value="over-40">über 40</option>
+                  </select>
+                </div>
+            </div>
+          </div>
+
+          {/* Generation Defaults */}
+          <div className="bg-nano-card p-6 shadow-xl">
+            <h3 className="text-title-large text-white mb-4">
+              Generierungs-Einstellungen
+            </h3>
+            
+            <div className="space-y-4">
+                {/* Default Resolution */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Standard Auflösung
+                  </label>
+                  <select
+                    value={userSettings.default_resolution || ''}
+                    onChange={(e) => handleInputChange('default_resolution', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.default_resolution ? 'hsl(47 100% 65%)' : 'hsl(var(--background))',
+                      color: userSettings.default_resolution ? '#374151' : 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="1K">1K</option>
+                    <option value="2K">2K</option>
+                    <option value="4K">4K</option>
+                  </select>
+                </div>
+
+                {/* Default Aspect Ratio */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Standard Seitenverhältnis
+                  </label>
+                  <select
+                    value={userSettings.default_aspect_ratio || ''}
+                    onChange={(e) => handleInputChange('default_aspect_ratio', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      backgroundColor: userSettings.default_aspect_ratio ? 'hsl(280 70% 60%)' : 'hsl(var(--background))',
+                      color: 'hsl(var(--foreground))',
+                      fontFamily: 'inherit',
+                      fontWeight: '500',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="1:1">1:1 (Quadrat)</option>
+                    <option value="9:16">9:16 (Hochformat/Story)</option>
+                    <option value="16:9">16:9 (Querformat/Widescreen)</option>
+                    <option value="4:3">4:3 (Post)</option>
+                    <option value="3:4">3:4 (Portrait)</option>
+                    <option value="2:3">2:3 (Portrait)</option>
+                    <option value="3:2">3:2 (Landscape)</option>
+                  </select>
+                </div>
             </div>
           </div>
         </div>
 
         {/* Save Status */}
         {lastSaved && (
-          <div className="mt-4 text-center text-sm text-gray-500">
-            Last saved: {lastSaved.toLocaleTimeString()}
+          <div className="mt-4 text-center text-sm text-slate-400">
+            Zuletzt gespeichert: {lastSaved.toLocaleTimeString()}
           </div>
         )}
       </main>

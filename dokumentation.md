@@ -937,3 +937,209 @@ Was ich gefixt habe:
   4. Shared CSS für alle
 
   Dann hat jede App das GLEICHE Design!
+
+
+  ....
+  DASHBOARD INHALT (auf Deutsch):
+
+  HAUPT-BEREICH:
+  1. Guthaben-Übersicht
+    - "Verbleibendes Guthaben: 127 Credits (≈42,30€)"
+    - "Heute verbraucht: 8 Credits für 6 Bilder, 1 Video"
+  2. Schnelle Aktionen
+    - "Bild generieren" (großer Button)
+    - "Video erstellen" (großer Button)
+    - "Galerie anzeigen"
+  3. Letzte Aktivität
+    - "Zuletzt: Vor 2 Stunden - 'Frau am Strand'"
+    - "Diese Woche: 45 Bilder, 3 Videos erstellt"
+
+  SEITEN-BEREICH:
+  4. Ausgaben-Verlauf
+  - "Heute: 8 Credits"
+  - "Diese Woche: 23 Credits"
+  - "Diesen Monat: 89 Credits"
+
+  5. Beliebteste Features
+    - "4K Bilder: 67% deiner Generierungen"
+    - "Video-Generierung: 5% deiner Credits"
+
+  MOTIVATIONS-BEREICH:
+  6. "Deine Kreativität"
+  - "156 Bilder erstellt"
+  - "Durchschnitt: 12 Bilder pro Woche"
+  - "Lieblings-Stil: Portrait-Fotografie"
+
+  Das ist was der User sehen WILL - nicht komplizierte Charts 
+  sondern seine CREDITS und was er GEMACHT hat!
+
+<<<<>>>>
+
+  KOMPLETTE DATENBANK-ÜBERSICHT:
+
+  HAUPTTABELLEN:
+
+  1. USERS Tabelle:
+
+  - Basic: username, email, password_hash
+  - Physical: hair_color, eye_color, skin_tone, age_range
+  - Settings: default_resolution, default_aspect_ratio, favorite_prompts
+  - Faces: main_face_image_url, face_2_image_url, face_3_image_url + names
+  - System: is_active, created_at, updated_at, last_login
+
+  2. USER_STATS Tabelle (Pro User):
+
+  - Tokens: daily/total prompt_tokens, output_tokens
+  - Kosten: daily/total cost_usd
+  - Generationen: daily/total counts für 2K/4K + 9:16/4:3
+  - Performance: generation_time_seconds, errors
+  - Reset: daily_reset_date für tägliche Zurücksetzung
+
+  3. DAILY_USAGE_HISTORY Tabelle:
+
+  - Analytics: cost_usd, generations_count pro Tag
+  - Features: count_2k_9_16, count_2k_4_3, count_4k_9_16, count_4k_4_3
+  - Intelligence: peak_usage_hour, most_used_prompts
+  - Business: tokens, errors_count pro Tag
+
+  4. GENERATIONS Tabelle (Haupttabelle):
+
+  - Request: prompt, resolution, aspect_ratio, main_face_image_url
+  - Status: 'processing', 'completed', 'failed'
+  - Results: result_image_url, result_base64, error_message
+  - Metadata: generation_time_seconds, retry_count
+  - Timestamps: created_at, started_at, completed_at
+
+  5. COMMUNITY_PROMPTS Tabelle:
+
+  - Content: title, prompt, category, likes
+  - Media: image_url, source_url von bananaprompts.xyz
+
+  VERFÜGBARE USER-DATEN:
+
+  ✅ ECHTE DATEN die wir haben:
+  - Alle Generierungen mit Prompts + Timestamps + Status
+  - Generation-Types (2K/4K, 9:16/4:3)
+  - Tokens + Kosten pro Tag/Gesamt
+  - Generierungs-Zeit pro Bild
+  - Fehler-Anzahl
+  - Face-Images URLs
+  - User-Einstellungen (Resolution/Aspect Ratio)
+  - Tägliche/Wöchentliche/Monatliche Stats
+
+  ❌ WAS FEHLT:
+  - Credit-System (nur USD-Kosten)
+  - Subscription-Tiers
+  - Video-Generationen (nur Bilder)
+
+---
+
+## 17. KRITISCHES AUTH-PROBLEM & LÖSUNG (V1 Session Management Fix)
+
+### 17.1 Das Problem: User Session verschwindet bei Navigation
+
+**Symptom:**
+```
+🔍 Dashboard useEffect: {user: true, authLoading: false, userExists: true}  ← User ist da
+🔍 Dashboard useEffect: {user: false, authLoading: false, userExists: false} ← User verschwindet!
+🚨 Dashboard redirecting to login - no user found
+```
+
+**Ursache:** 
+- Supabase `onAuthStateChange()` Listener triggert bei jedem Re-Render neue Events
+- "Multiple GoTrueClient instances" entstehen durch Re-Renders
+- Session State wird instabil und User verschwindet zwischen Route-Wechseln
+
+**Betroffene Navigation:**
+- Settings → Dashboard = ❌ Login Redirect
+- Dashboard → Nano-Banana → Dashboard = ✅ funktioniert (verschiedene Apps)
+
+### 17.2 Die Lösung: V1-Style Session Management
+
+**Was V1 richtig macht:**
+```js
+// V1 - STABIL
+const session = SessionManager.getSession()
+if (session && session.user) {
+  setUser(session.user) // EINMAL setzen, bleibt stabil!
+}
+```
+
+**Was V2 falsch macht:**
+```tsx  
+// V2 - INSTABIL
+const supabase = createSupabaseClient() // Immer neue Instanz!
+supabase.auth.onAuthStateChange() // Triggert ständig Events!
+```
+
+### 17.3 Implementation Fix
+
+**1. Singleton Supabase Client:**
+```tsx
+// packages/auth-config/src/index.ts
+const getSupabaseClient = (() => {
+  let instance: ReturnType<typeof createSupabaseClient> | null = null
+  return () => {
+    if (!instance) {
+      instance = createSupabaseClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey)
+    }
+    return instance
+  }
+})()
+```
+
+**2. Stable Session Management (ohne onAuthStateChange):**
+```tsx
+// Entferne: supabase.auth.onAuthStateChange() - URSACHE DES PROBLEMS!
+// Verwende: Simple localStorage session check (wie V1)
+const initializeAuth = () => {
+  const storedUser = localStorage.getItem('v1_user')
+  if (storedUser) {
+    const parsedUser = JSON.parse(storedUser)
+    setUser(parsedUser) // EINMAL setzen, bleibt stabil
+  }
+}
+```
+
+### 17.4 Warum das funktioniert
+
+**Vorher:**
+1. Settings → Dashboard Navigation triggert Re-Render
+2. AuthProvider wird neu gemountet → NEUER Supabase Client
+3. Alter Client wird ungültig → User State geht verloren
+4. Dashboard sieht `user: false` → Redirect zu Login
+
+**Nachher:**  
+1. Settings → Dashboard Navigation triggert Re-Render
+2. AuthProvider wird neu gemountet ABER verwendet den gleichen Supabase Client
+3. Session bleibt erhalten → User verschwindet nicht
+4. Kein Redirect zur Login-Seite
+
+### 17.5 Commit Reference
+
+```
+Fix: Implement V1-style stable session management
+- Remove unstable onAuthStateChange listener
+- Add singleton Supabase client pattern  
+- Use localStorage-based session restoration like V1
+- Fixes Settings → Dashboard navigation redirecting to login
+```
+
+**Erfolgsmesssung:**
+```
+✅ Settings → Dashboard navigation funktioniert
+✅ Keine "Multiple GoTrueClient instances" Warnungen  
+✅ User State bleibt stabil zwischen Route-Wechseln
+✅ Keine unerwarteten Login-Redirects
+```
+
+### 17.6 Wichtiger Hinweis für Module
+
+**Potential Impact:** Da wir `onAuthStateChange` entfernt haben, könnten separate Module (Nano-Banana) betroffen sein, die eigene Auth-Logik haben.
+
+**Testing Required:**
+1. ✅ Settings ↔ Dashboard Navigation  
+2. ⚠️ Dashboard → Nano-Banana → Dashboard (testen ob noch funktioniert)
+3. ⚠️ Andere Module auf Auth-Probleme prüfen
+
+**Fallback:** Falls Module Probleme haben, können wir modulspezifische Auth-Fixes implementieren ohne das Platform-Auth zu beeinträchtigen.

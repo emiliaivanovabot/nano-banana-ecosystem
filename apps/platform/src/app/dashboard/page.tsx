@@ -9,7 +9,7 @@ import ImageModal from '../components/ImageModal'
 
 export default function Dashboard() {
   const router = useRouter()
-  const { user, loading, logout } = useAuth()
+  const { user, loading: authLoading, logout } = useAuth()
   const [selectedPeriod, setSelectedPeriod] = useState<'7' | '14' | 'month' | 'total'>('7')
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false)
   const [selectedImage, setSelectedImage] = useState<{
@@ -126,10 +126,12 @@ export default function Dashboard() {
   } : null
 
   useEffect(() => {
-    if (!loading && !user) {
+    console.log('🔍 Dashboard useEffect:', { user: !!user, authLoading, userExists: !!user })
+    if (!authLoading && !user) {
+      console.log('🚨 Dashboard redirecting to login - no user found')
       router.push('/login')
     }
-  }, [user, loading, router])
+  }, [user, authLoading, router])
 
   useEffect(() => {
     if (user) {
@@ -189,7 +191,7 @@ export default function Dashboard() {
     }
   }
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="page-layout flex-center">
         <div className="text-body">Loading...</div>
