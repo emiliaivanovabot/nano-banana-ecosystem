@@ -9,20 +9,20 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.1.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "@nano-banana/ui-components": "file:../../packages/ui-components",
     "@repo/auth-config": "*",
     "@repo/database": "*",
-    "@nano-banana/ui-components": "file:../../packages/ui-components"
+    "next": "^16.0.10",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.1.0",
-    "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
