@@ -1,0 +1,106 @@
+/* NANO BANANA BADGE SYSTEM */
+/* Status badges für Dashboard und andere Components */
+
+/* BASE BADGE STYLES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  border-radius: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  line-height: 1.2;
+}
+
+/* COLOR VARIANTS */
+.badge-gray {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #e5e7eb;
+}
+
+.badge-blue {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+
+.badge-purple {
+  background: #f3e8ff;
+  color: #7c3aed;
+  border-color: #c4b5fd;
+}
+
+.badge-green {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.badge-red {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.badge-yellow {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+/* DARK MODE SUPPORT */
+@media (prefers-color-scheme: dark) {
+  .badge-gray {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+  }
+
+  .badge-blue {
+    background: #1e3a8a;
+    color: #dbeafe;
+    border-color: #3b82f6;
+  }
+
+  .badge-purple {
+    background: #5b21b6;
+    color: #f3e8ff;
+    border-color: #8b5cf6;
+  }
+
+  .badge-green {
+    background: #064e3b;
+    color: #d1fae5;
+    border-color: #10b981;
+  }
+
+  .badge-red {
+    background: #991b1b;
+    color: #fee2e2;
+    border-color: #ef4444;
+  }
+
+  .badge-yellow {
+    background: #92400e;
+    color: #fef3c7;
+    border-color: #f59e0b;
+  }
+}
+
+/* SIZE VARIANTS */
+.badge-small {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.badge-large {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 20px;
+}

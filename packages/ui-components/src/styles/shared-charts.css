@@ -1,0 +1,168 @@
+/* NANO BANANA CHART SYSTEM */
+/* Simple CSS charts that motivate users with upward trends */
+
+.chart-container {
+  position: relative;
+  height: 80px;
+  background: hsl(var(--background));
+  border-radius: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: end;
+  height: 100%;
+  gap: 4px;
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #f59e0b 0%, #ec4899 100%);
+  border-radius: 2px 2px 0 0;
+  transition: all 0.3s ease;
+  min-height: 4px;
+  position: relative;
+  animation: growUp 0.6s ease-out forwards;
+}
+
+@keyframes growUp {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-bar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+/* Motivational upward arrow */
+.chart-trend {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #10b981;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.chart-trend.positive::before {
+  content: "📈";
+  font-size: 12px;
+}
+
+.chart-trend.neutral::before {
+  content: "➡️";
+  font-size: 12px;
+}
+
+.chart-trend.negative::before {
+  content: "📉";
+  font-size: 12px;
+  color: #ef4444;
+}
+
+/* Line chart variant */
+.line-chart {
+  position: relative;
+  height: 60px;
+  background: hsl(var(--background));
+  border-radius: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.line-chart-path {
+  stroke: #f59e0b;
+  stroke-width: 3;
+  fill: none;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+  animation: drawLine 1s ease-out forwards;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.line-chart-area {
+  fill: url(#gradient);
+  opacity: 0.3;
+  animation: fillArea 1.2s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+@keyframes fillArea {
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* Gradient definition for area fill */
+.chart-gradient-yellow {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0) 100%);
+}
+
+/* Achievement indicators */
+.achievement-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  animation: bounceIn 0.6s ease-out 0.8s both;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Motivational text */
+.motivation-text {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 4px;
+  animation: fadeIn 0.6s ease-out 1s both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 60px;
+  }
+  
+  .chart-bar {
+    gap: 2px;
+  }
+  
+  .chart-trend {
+    font-size: 12px;
+  }
+}

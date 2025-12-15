@@ -6,6 +6,7 @@ import './styles/shared-buttons.css'
 import './styles/shared-typography.css'
 import './styles/shared-backgrounds.css'
 import './styles/shared-layout.css'
+import './styles/shared-badges.css'
 
 export { default as ImageModal } from './components/ImageModal'
 export { default as BackButton } from './components/BackButton'
