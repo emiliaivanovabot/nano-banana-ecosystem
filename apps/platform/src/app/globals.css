@@ -1,16 +1,10 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --card: 240 8% 7%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 5% 15%;
-  --primary: 47 100% 65%;
-  --primary-foreground: #000000;
-  --secondary: 280 70% 60%;
-  --secondary-foreground: 0 0% 98%;
-}
+/* IMPORT NANO BANANA UI COMPONENTS STYLES */
+@import "../../../../packages/ui-components/src/styles/shared-backgrounds.css";
+@import "../../../../packages/ui-components/src/styles/shared-buttons.css";
+@import "../../../../packages/ui-components/src/styles/shared-typography.css";
+@import "../../../../packages/ui-components/src/styles/shared-layout.css";
 
 @theme inline {
   --color-background: var(--background);
@@ -21,17 +15,210 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card: #1a1a1a;
-    --border: #374151;
-    --primary-foreground: #000000;
-    --secondary-foreground: #ffffff;
+    /* DARK MODE COLORS */
+    --background: 222.2 84% 4.9%;      /* Dunkel */
+    --foreground: 210 40% 98%;         /* Hell */
+    --card: 222.2 84% 4.9%;           /* Dunkle Cards */
+    --card-foreground: 210 40% 98%;   /* Heller Text */
+    --border: 217.2 32.6% 17.5%;      /* Dunkle Border */
+    --primary: 217.2 91.2% 59.8%;     /* Hellblau */
+    --primary-foreground: 222.2 84% 4.9%; /* Dunkel auf Primary */
+    --secondary: 217.2 32.6% 17.5%;   /* Dunkelgrau */
+    --secondary-foreground: 210 40% 98%; /* Hell auf Secondary */
+    --muted: 217.2 32.6% 17.5%;       /* Gedämpft Dunkel */
+    --muted-foreground: 215 20.2% 65.1%; /* Gedämpfter Text */
+    --accent: 217.2 32.6% 17.5%;      /* Dunkel Akzent */
+    --accent-foreground: 210 40% 98%; /* Hell auf Akzent */
+    
+    /* NANO BANANA DARK MODE */
+    --nano-gradient-from: 332 81% 71%; /* Helleres Pink */
+    --nano-gradient-to: 43 96% 65%;    /* Helleres Orange */
+    --nano-header-bg: 222.2 84% 4.9%;  /* Dunkler Header */
+    --nano-page-bg: 222.2 84% 4.9%;    /* Dunkle Page */
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* NANO BANANA CSS UTILITY CLASSES */
+.bg-nano-header {
+  background-color: hsl(var(--nano-header-bg));
+  border-bottom: 1px solid hsl(var(--border));
+  backdrop-filter: blur(20px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bg-nano-card {
+  background: hsl(var(--card));
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.text-yellow {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.btn-yellow {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  color: #1a1200;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+  border: 2px solid #d97706;
+}
+
+.btn-yellow:hover {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  border-color: #b45309;
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+  color: #ffffff;
+  font-weight: 700;
+  border: 2px solid #7c3aed;
+}
+
+.btn-purple:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-color: #5b21b6;
+}
+
+.shadow-nano {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.shadow-nano-md {
+  box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+}
+
+/* NANO BANANA LAYOUT CLASSES */
+.page-layout {
+  min-height: 100vh;
+  background: hsl(var(--background));
+}
+
+.container-nano {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-nano {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.grid-nano-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.grid-nano-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* NANO BANANA TYPOGRAPHY */
+.title-large {
+  font-size: 2rem;
+  font-weight: 800;
+  color: hsl(var(--foreground));
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+}
+
+.text-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.text-title-large {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.text-body {
+  font-size: 1rem;
+  color: hsl(var(--foreground));
+}
+
+.text-body-small {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.text-muted {
+  color: hsl(var(--muted-foreground));
+}
+
+/* NANO BANANA BUTTONS */
+.btn-base {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-base:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-secondary {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.btn-red {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btn-disabled {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-disabled:hover {
+  transform: none;
+  box-shadow: none;
 }

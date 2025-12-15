@@ -11,6 +11,7 @@ export default function Dashboard() {
   const router = useRouter()
   const { user, loading, logout } = useAuth()
   const [selectedPeriod, setSelectedPeriod] = useState<'7' | '14' | 'month' | 'total'>('7')
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false)
   const [selectedImage, setSelectedImage] = useState<{
     id: string
     result_image_url: string
@@ -231,25 +232,27 @@ export default function Dashboard() {
         <header className="bg-nano-header">
           <div className="container-nano">
             <div className="flex-between py-4">
-              <div>
-                <h1 className="title-large">
-                  Nano Banana Platform
-                </h1>
-                <p className="subtitle">Welcome back, <span className="text-yellow font-bold text-lg capitalize">{v1User.username?.split('.')[0]}</span> 👋</p>
-              </div>
-              <div className="flex-nano">
-                <button
-                  onClick={() => router.push('/settings')}
-                  className="btn-base btn-secondary"
-                >
-                  ⚙️ Settings
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="btn-base btn-red"
-                >
-                  👋 Logout
-                </button>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h1 className="title-large">
+                    Nano Banana Platform
+                  </h1>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium"
+                  >
+                    Logout
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="subtitle">Welcome back, <span className="text-yellow font-bold text-lg capitalize">{v1User.username?.split('.')[0]}</span> 👋</p>
+                  <button
+                    onClick={() => router.push('/settings')}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-1.5 rounded transition-colors text-sm font-medium"
+                  >
+                    Settings
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -264,6 +267,39 @@ export default function Dashboard() {
               
               {/* Linke Spalte: Haupt-Bereich (3/4) */}
               <div className="xl:col-span-3 space-y-6">
+                
+                {/* 0. Favoriten - Kompakt */}
+                <div className="bg-nano-card p-3 shadow-xl">
+                  <h3 className="text-sm font-bold text-white mb-2">⭐ Favoriten</h3>
+                  <div className="flex gap-1">
+                    <a
+                      href="/generation-modes"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                    >
+                      Nano-Banana
+                    </a>
+                    <a
+                      href="http://localhost:3001"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                    >
+                      WAN 2.5
+                    </a>
+                    <a
+                      href="/inspiration"
+                      className="bg-slate-600 hover:bg-slate-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                    >
+                      Grok Prompts
+                    </a>
+                    <a
+                      href="/generation-modes"
+                      className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                    >
+                      Seedream
+                    </a>
+                  </div>
+                </div>
                 
                 {/* 1. Guthaben-Übersicht - Kompakt */}
                 <div className="bg-nano-card p-4 shadow-2xl">
@@ -284,122 +320,156 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="border-t border-slate-700 pt-3">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">⚡ Performance</h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-slate-300">⚡ Performance</h4>
+                      <button
+                        onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+                        className="text-xs text-slate-400 hover:text-slate-300 transition-colors flex items-center gap-1"
+                      >
+                        Details
+                        <svg
+                          className={`w-3 h-3 transition-transform ${isDetailsExpanded ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </div>
                     <div className="grid grid-cols-6 gap-4">
                       <div className="text-center">
-                        <div className="text-lg font-bold text-emerald-400">{userProfile.success_rate}%</div>
+                        <div className="text-sm font-bold text-white">{userProfile.success_rate}%</div>
                         <div className="text-xs text-slate-400">Erfolg</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-lg font-bold text-blue-400">{userProfile.avg_generation_time}s</div>
+                        <div className="text-sm font-bold text-white">{userProfile.avg_generation_time}s</div>
                         <div className="text-xs text-slate-400">Ø Zeit</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-lg font-bold text-purple-400">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
+                        <div className="text-sm font-bold text-white">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
                         <div className="text-xs text-slate-400">Tokens</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-lg font-bold text-red-400">{userProfile.total_errors}</div>
+                        <div className="text-sm font-bold text-white">{userProfile.total_errors}</div>
                         <div className="text-xs text-slate-400">Errors</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-lg font-bold text-orange-400">{userProfile.total_credits_used}</div>
+                        <div className="text-sm font-bold text-white">{userProfile.total_credits_used}</div>
                         <div className="text-xs text-slate-400">Credits</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-lg font-bold text-pink-400">{userProfile.total_generations}</div>
+                        <div className="text-sm font-bold text-white">{userProfile.total_generations}</div>
                         <div className="text-xs text-slate-400">Media</div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="border-t border-slate-700 pt-3 mt-3">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">💰 Ausgaben-Verlauf</h4>
-                    <div className="grid grid-cols-4 gap-2 text-sm">
-                      <div className="text-center">
-                        <div className="text-yellow-400 font-bold">{todayStats?.total_credits_used_today || 0}</div>
-                        <div className="text-slate-400">Heute</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-white font-bold">23</div>
-                        <div className="text-slate-400">Woche</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-emerald-400 font-bold">{userProfile.total_credits_used}</div>
-                        <div className="text-slate-400">Monat</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-slate-300 font-bold">${userProfile?.total_cost_usd?.toFixed(2) || '0.00'}</div>
-                        <div className="text-slate-400">Total</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-slate-700 pt-3 mt-3">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">📐 Formate & Tech Stats</h4>
-                    <div className="space-y-3">
-                      {/* Beliebte Formate */}
-                      <div>
-                        <h5 className="text-xs font-medium text-slate-400 mb-1">Beliebte Formate</h5>
-                        <div className="relative bg-slate-700 h-4 mb-3 flex rounded overflow-hidden shadow-sm">
-                          <div className="bg-yellow-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '45%'}}>
-                            <span className="text-black text-xs font-bold">16:9</span>
+                  {isDetailsExpanded && (
+                    <>
+                      <div className="border-t border-slate-700 pt-3 mt-3">
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">💰 Ausgaben-Verlauf</h4>
+                        <div className="grid grid-cols-4 gap-2">
+                          <div className="text-center">
+                            <div className="text-sm font-bold text-white">{todayStats?.total_credits_used_today || 0}</div>
+                            <div className="text-xs text-slate-400">Heute</div>
                           </div>
-                          <div className="bg-purple-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '28%'}}>
-                            <span className="text-white text-xs font-bold">1:1</span>
+                          <div className="text-center">
+                            <div className="text-sm font-bold text-white">{Math.round(userProfile.total_credits_used * 0.15)}</div>
+                            <div className="text-xs text-slate-400">Woche</div>
                           </div>
-                          <div className="bg-emerald-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '18%'}}>
-                            <span className="text-white text-xs font-bold">9:16</span>
+                          <div className="text-center">
+                            <div className="text-sm font-bold text-white">{userProfile.total_credits_used}</div>
+                            <div className="text-xs text-slate-400">Monat</div>
                           </div>
-                          <div className="bg-blue-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '9%'}}>
-                            <span className="text-white text-xs font-bold">4:3</span>
+                          <div className="text-center">
+                            <div className="text-sm font-bold text-white">${userProfile?.total_cost_usd?.toFixed(2) || '0.00'}</div>
+                            <div className="text-xs text-slate-400">Total</div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Tech Stats */}
-                      <div>
-                        <h5 className="text-xs font-medium text-slate-400 mb-1">Tech Stats</h5>
-                        <div className="grid grid-cols-4 gap-2 text-xs">
-                          <div className="text-center">
-                            <div className="text-red-400 font-bold">2</div>
-                            <div className="text-slate-400">Fehler</div>
+                      <div className="border-t border-slate-700 pt-3 mt-3">
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">⭐ Beliebteste Programme</h4>
+                        <div className="relative bg-slate-700 h-4 mb-2 flex rounded overflow-hidden shadow-sm">
+                          <div className="bg-yellow-400/60 h-4 transition-all hover:brightness-110" style={{width: '67%'}}></div>
+                          <div className="bg-blue-400/60 h-4 transition-all hover:brightness-110" style={{width: '28%'}}></div>
+                          <div className="bg-purple-400/60 h-4 transition-all hover:brightness-110" style={{width: '5%'}}></div>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-yellow-400/70 font-bold">Nano-Banana</span>
+                          <span className="text-blue-400/70 font-bold">Seedream</span>
+                          <span className="text-purple-400/70 font-bold">WAN</span>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-slate-700 pt-3 mt-3">
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">📐 Formate & Tech Stats</h4>
+                        <div className="space-y-3">
+                          {/* Beliebte Formate */}
+                          <div>
+                            <h5 className="text-xs font-medium text-slate-400 mb-1">Beliebte Formate</h5>
+                            <div className="relative bg-slate-700 h-4 mb-3 flex rounded overflow-hidden shadow-sm">
+                              <div className="bg-yellow-400/60 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '45%'}}>
+                                <span className="text-black text-xs font-bold">16:9</span>
+                              </div>
+                              <div className="bg-purple-400/60 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '28%'}}>
+                                <span className="text-black text-xs font-bold">1:1</span>
+                              </div>
+                              <div className="bg-emerald-400/60 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '18%'}}>
+                                <span className="text-black text-xs font-bold">9:16</span>
+                              </div>
+                              <div className="bg-blue-400/60 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '9%'}}>
+                                <span className="text-black text-xs font-bold">4:3</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-center">
-                            <div className="text-blue-400 font-bold">1.2s</div>
-                            <div className="text-slate-400">Ø Zeit</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-purple-400 font-bold">124</div>
-                            <div className="text-slate-400">2K</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-yellow-400 font-bold">43</div>
-                            <div className="text-slate-400">4K</div>
+                          
+                          {/* Tech Stats */}
+                          <div>
+                            <h5 className="text-xs font-medium text-slate-400 mb-1">Tech Stats</h5>
+                            <div className="grid grid-cols-4 gap-2">
+                              <div className="text-center">
+                                <div className="text-sm font-bold text-white">{userProfile.total_errors}</div>
+                                <div className="text-xs text-slate-400">Fehler</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-sm font-bold text-white">{userProfile.avg_generation_time}s</div>
+                                <div className="text-xs text-slate-400">Ø Zeit</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-sm font-bold text-white">{userProfile.daily_count_2k_9_16 || 0}</div>
+                                <div className="text-xs text-slate-400">2K</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-sm font-bold text-white">{userProfile.daily_count_4k_9_16 || 0}</div>
+                                <div className="text-xs text-slate-400">4K</div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-slate-700 pt-3 mt-3">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">🔑 API Status</h4>
-                    <div className="flex justify-between items-center text-xs">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-slate-300">Gemini</span>
+                      
+                      <div className="border-t border-slate-700 pt-3 mt-3">
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">🔑 API Status</h4>
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-slate-300">Gemini</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-slate-300">Nano-Banana</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                            <span className="text-slate-300">Keys Valid</span>
+                          </div>
+                          <div className="text-slate-400 text-xs">5min ago</div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-slate-300">Nano-Banana</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                        <span className="text-slate-300">Keys Valid</span>
-                      </div>
-                      <div className="text-slate-400 text-xs">5min ago</div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
 
                 {/* 1.6 Nutzungstrend Chart */}
@@ -731,51 +801,6 @@ export default function Dashboard() {
               {/* Rechte Spalte: Seiten-Bereich (1/4) */}
               <div className="space-y-6">
                 
-                {/* 5. Beliebteste Features */}
-                <div className="bg-nano-card p-3 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-2">⭐ Beliebteste Programme</h3>
-                  <div className="relative bg-slate-700 h-4 mb-2 flex rounded overflow-hidden shadow-sm">
-                    <div className="bg-yellow-500 h-4 transition-all hover:brightness-110" style={{width: '67%'}}></div>
-                    <div className="bg-blue-500 h-4 transition-all hover:brightness-110" style={{width: '28%'}}></div>
-                    <div className="bg-purple-500 h-4 transition-all hover:brightness-110" style={{width: '5%'}}></div>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-yellow-500 font-bold">Nano-Banana</span>
-                    <span className="text-blue-500 font-bold">Seedream</span>
-                    <span className="text-purple-500 font-bold">WAN</span>
-                  </div>
-                </div>
-
-                {/* 3. Schnelle Aktionen - Kompakt */}
-                <div className="bg-nano-card p-4 shadow-2xl">
-                  <h3 className="text-lg font-bold text-white mb-3">Schnelle Aktionen</h3>
-                  <div className="flex gap-2">
-                    <a
-                      href="/generation-modes"
-                      className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium flex-1 justify-center"
-                    >
-                      <span>🍌</span>
-                      <span>Bild generieren</span>
-                    </a>
-                    <a
-                      href="http://localhost:3001"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium flex-1 justify-center"
-                    >
-                      <span>📹</span>
-                      <span>Video erstellen</span>
-                    </a>
-                    <a
-                      href="/inspiration"
-                      className="flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium flex-1 justify-center"
-                    >
-                      <span>💡</span>
-                      <span>Inspiration</span>
-                    </a>
-                  </div>
-                </div>
-
               </div>
               
             </div>
@@ -801,18 +826,6 @@ export default function Dashboard() {
                       className="btn-base btn-yellow"
                     >
                       Launch Nano Banana
-                    </a>
-                    <a
-                      href="/gallery"
-                      className="btn-base btn-secondary"
-                    >
-                      📸 Gallery
-                    </a>
-                    <a
-                      href="/inspiration"
-                      className="btn-base btn-secondary"
-                    >
-                      💡 Inspiration
                     </a>
                   </div>
                 </div>
@@ -888,28 +901,82 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Statistics */}
-          {recentGenerations && recentGenerations.length > 0 && (
-            <div className="mt-8 bg-nano-card p-6">
-              <div>
-                <h3 className="text-title mb-4">
-                  Usage Statistics
-                </h3>
-                <div className="grid-nano-2 gap-4">
-                  <div>
-                    <dt className="text-body-small text-muted">Total Generations</dt>
-                    <dd className="mt-1 text-title-large">{recentGenerations.length}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-body-small text-muted">Last Generation</dt>
-                    <dd className="mt-1 text-body">
-                      {new Date(recentGenerations[0].created_at).toLocaleDateString()}
-                    </dd>
+          {/* 2. Letzte Aktivität - NACH UNTEN VERSCHOBEN */}
+          <div className="bg-nano-card p-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-white mb-3">Letzte Aktivität</h3>
+            <div className="space-y-3">
+              {!user ? (
+                <div className="text-center text-slate-400">Bitte einloggen um Bilder zu sehen.</div>
+              ) : recentGenerations === null ? (
+                <div className="text-center text-slate-400">Lade Bilder...</div>
+              ) : recentGenerations.length === 0 ? (
+                <div className="text-center text-slate-400">Noch keine Bilder generiert.</div>
+              ) : (
+                <div className="flex gap-2 overflow-x-auto pb-2" style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#ccc transparent'
+                }}>
+                  {recentGenerations.map((generation, index) => (
+                    <img
+                      key={generation.id}
+                      src={generation.result_image_url}
+                      className="w-20 h-20 object-cover rounded-lg cursor-pointer transition-all duration-200 flex-shrink-0 border-2 border-transparent hover:scale-105 hover:border-blue-500 shadow-sm hover:shadow-md"
+                      onClick={() => {
+                        setSelectedImage({
+                          id: generation.id,
+                          result_image_url: generation.result_image_url,
+                          prompt: generation.prompt,
+                          created_at: generation.created_at,
+                          generation_type: generation.generation_type,
+                          username: generation.username
+                        })
+                      }}
+                      loading="lazy"
+                      alt={`Generated image from ${generation.created_at}`}
+                      title={`${generation.generation_type} - ${new Date(generation.created_at).toLocaleDateString()}`}
+                    />
+                  ))}
+                  {/* Button zur Galerie */}
+                  <a
+                    href="/gallery"
+                    className="w-20 h-20 rounded-lg cursor-pointer transition-all duration-200 flex-shrink-0 border-2 border-dashed border-slate-500 hover:scale-105 hover:border-blue-500 shadow-sm hover:shadow-md bg-slate-700/50 backdrop-blur flex flex-col items-center justify-center hover:bg-slate-600/50"
+                    title="Alle Bilder anzeigen"
+                  >
+                    <svg className="w-6 h-6 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="text-xs text-slate-400 font-medium">Alle</span>
+                  </a>
+                </div>
+              )}
+              
+              {todayStats && (
+              <div className="grid grid-cols-3 gap-4 text-center border-t border-slate-700 pt-3">
+                <div>
+                  <div className="text-lg font-bold text-emerald-400">{userProfile?.total_generations || 156}</div>
+                  <div className="text-xs text-slate-400">Bilder gesamt</div>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <span className="text-xs bg-yellow-600/30 text-yellow-300 px-2 py-0.5 rounded">nano-banana</span>
+                    <span className="text-xs bg-purple-600/30 text-purple-300 px-2 py-0.5 rounded">seedream</span>
                   </div>
                 </div>
+                <div>
+                  <div className="text-lg font-bold text-blue-400">{todayStats.wan_video_count || 1}</div>
+                  <div className="text-xs text-slate-400">Videos gesamt</div>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <span className="text-xs bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">wan2.5</span>
+                    <span className="text-xs bg-gray-600/30 text-gray-300 px-2 py-0.5 rounded">grok</span>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-purple-400">{(userProfile?.total_generations || 156) + (todayStats.wan_video_count || 1)}</div>
+                  <div className="text-xs text-slate-400">Media gesamt</div>
+                </div>
               </div>
+              )}
             </div>
-          )}
+          </div>
+
         </main>
         </div>
         
