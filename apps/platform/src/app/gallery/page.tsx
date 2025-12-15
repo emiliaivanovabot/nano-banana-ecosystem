@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 import { useAuth } from '@repo/auth-config'
+import ImageModal from '../components/ImageModal'
 import './gallery.css'
 
 interface GalleryImage {
@@ -22,8 +23,6 @@ export default function GalleryPage() {
   const [images, setImages] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
-  const [copySuccess, setCopySuccess] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [showFloatingButton, setShowFloatingButton] = useState(false)
@@ -191,23 +190,9 @@ export default function GalleryPage() {
 
   const closeModal = () => {
     setSelectedImage(null)
-    setIsFullscreen(false)
     document.body.style.overflow = 'unset'
   }
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
-
-  const copyPrompt = (prompt: string) => {
-    navigator.clipboard.writeText(prompt).then(() => {
-      console.log('✅ Prompt copied to clipboard')
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
-    }).catch(err => {
-      console.error('❌ Failed to copy prompt:', err)
-    })
-  }
 
   const getImageNumber = (filename: string, generationType: string) => {
     if (!filename || generationType === 'single') return null
@@ -270,20 +255,8 @@ export default function GalleryPage() {
         document.body
       )}
 
-      {/* Header with dark theme */}
-      <div style={{
-        background: 'hsl(var(--card))',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid hsl(var(--border))',
-        padding: '20px 0',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginBottom: '0'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 20px'
-        }}>
+      <div className="inspiration-header">
+        <div className="header-content">
           <a href="/nano-banana" className="back-link">
             ← Zurück zu Nano Banana
           </a>
@@ -464,126 +437,13 @@ export default function GalleryPage() {
         )}
       </div>
 
-      {/* Modal */}
-      {selectedImage && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.9)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '20px'
-          }}
-          onClick={closeModal}
-        >
-          <div 
-            style={{
-              background: 'hsl(var(--card))',
-              borderRadius: '16px',
-              padding: '24px',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              overflow: 'auto',
-              position: 'relative'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              onClick={closeModal}
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
-                color: 'hsl(var(--foreground))'
-              }}
-            >
-              ✖
-            </button>
-            
-            <img 
-              src={selectedImage.result_image_url} 
-              alt="Selected image"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '70vh',
-                objectFit: 'contain',
-                borderRadius: '8px',
-                marginBottom: '16px'
-              }}
-              onClick={toggleFullscreen}
-            />
-            
-            <div style={{ marginBottom: '16px' }}>
-              <p style={{ 
-                margin: '0 0 8px 0',
-                fontSize: '14px',
-                color: 'hsl(var(--muted-foreground))'
-              }}>
-                {new Date(selectedImage.created_at).toLocaleString('de-DE')} • {selectedImage.generation_type}
-              </p>
-              {selectedImage.prompt && (
-                <p style={{ 
-                  margin: 0,
-                  fontSize: '16px',
-                  color: 'hsl(var(--foreground))'
-                }}>
-                  <strong>Prompt:</strong> {selectedImage.prompt}
-                </p>
-              )}
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              flexWrap: 'wrap'
-            }}>
-              <button 
-                onClick={() => window.open(selectedImage.result_image_url, '_blank')}
-                style={{
-                  padding: '8px 16px',
-                  background: 'hsl(var(--primary))',
-                  color: 'hsl(var(--primary-foreground))',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-              >
-                Bild öffnen
-              </button>
-              
-              {selectedImage.prompt && (
-                <button 
-                  onClick={() => copyPrompt(selectedImage.prompt)}
-                  style={{
-                    padding: '8px 16px',
-                    background: 'hsl(var(--secondary))',
-                    color: 'hsl(var(--secondary-foreground))',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}
-                >
-                  {copySuccess ? '✅ Kopiert!' : 'Prompt kopieren'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Unified Modal System with new ImageModal Component */}
+      <ImageModal
+        selectedImage={selectedImage}
+        onClose={closeModal}
+        title="Meine Galerie"
+        showUsername={false}
+      />
     </div>
   )
 }

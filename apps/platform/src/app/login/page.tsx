@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@repo/auth-config'
+import '@nano-banana/ui-components'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -29,27 +30,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+    <div className="page-layout flex-center">
+      <div className="bg-nano-card p-8 container-nano-narrow">
+        <div className="text-center mb-8">
+          <h2 className="title-large">
             Platform Login
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="subtitle">
             Access your Nano Banana Platform account
           </p>
         </div>
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="flex-col gap-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-error text-white p-4 rounded">
               {error}
             </div>
           )}
           
-          <div className="space-y-4">
+          <div className="flex-col gap-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="username" className="text-body-small text-muted mb-2">
                 Username
               </label>
               <input
@@ -59,13 +60,13 @@ export default function LoginPage() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="w-full p-3 border border-gray-300 rounded bg-background text-body"
                 placeholder="Enter your username (e.g., emilia.berlin)"
               />
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="text-body-small text-muted mb-2">
                 Password
               </label>
               <input
@@ -75,7 +76,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="w-full p-3 border border-gray-300 rounded bg-background text-body"
                 placeholder="Enter your password"
               />
             </div>
@@ -85,14 +86,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-base btn-yellow btn-full btn-large"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>
         
-        <div className="text-center text-sm text-gray-600">
+        <div className="text-center text-caption text-muted mt-6">
           <p>Test credentials: emilia.berlin - password: 2002</p>
           <p>Or any user from the V1 system</p>
         </div>

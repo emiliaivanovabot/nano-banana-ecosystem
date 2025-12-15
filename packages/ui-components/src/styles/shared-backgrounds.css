@@ -1,0 +1,210 @@
+/* NANO BANANA BACKGROUND SYSTEM - NEVER CHANGE THESE COLORS! */
+/* Single Source of Truth für alle Hintergründe und Layouts */
+
+/* CSS CUSTOM PROPERTIES (CSS Variables) */
+:root {
+  /* LIGHT MODE COLORS */
+  --background: 0 0% 100%;           /* Weiß */
+  --foreground: 222.2 84% 4.9%;      /* Fast Schwarz */
+  --card: 0 0% 100%;                 /* Weiß für Cards */
+  --card-foreground: 222.2 84% 4.9%; /* Text auf Cards */
+  --primary: 221.2 83.2% 53.3%;      /* Blau */
+  --primary-foreground: 210 40% 98%; /* Weiß auf Primary */
+  --secondary: 210 40% 96%;          /* Hellgrau */
+  --secondary-foreground: 222.2 84% 4.9%; /* Dunkel auf Secondary */
+  --muted: 210 40% 96%;              /* Gedämpft */
+  --muted-foreground: 215.4 16.3% 46.9%; /* Gedämpfter Text */
+  --accent: 210 40% 96%;             /* Akzent */
+  --accent-foreground: 222.2 84% 4.9%; /* Text auf Akzent */
+  --destructive: 0 84.2% 60.2%;      /* Rot */
+  --destructive-foreground: 210 40% 98%; /* Weiß auf Rot */
+  --border: 214.3 31.8% 91.4%;       /* Border Grau */
+  --input: 214.3 31.8% 91.4%;        /* Input Border */
+  --ring: 221.2 83.2% 53.3%;         /* Focus Ring */
+  
+  /* NANO BANANA SPECIFIC COLORS */
+  --nano-gradient-from: 331 83% 58%;  /* Pink #ec4899 */
+  --nano-gradient-to: 43 100% 51%;    /* Orange #f59e0b */
+  --nano-header-bg: 0 0% 100%;        /* Header Background */
+  --nano-page-bg: 0 0% 100%;          /* Page Background */
+}
+
+/* DARK MODE COLORS */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 222.2 84% 4.9%;      /* Dunkel */
+    --foreground: 210 40% 98%;         /* Hell */
+    --card: 222.2 84% 4.9%;           /* Dunkle Cards */
+    --card-foreground: 210 40% 98%;   /* Heller Text */
+    --primary: 217.2 91.2% 59.8%;     /* Hellblau */
+    --primary-foreground: 222.2 84% 4.9%; /* Dunkel auf Primary */
+    --secondary: 217.2 32.6% 17.5%;   /* Dunkelgrau */
+    --secondary-foreground: 210 40% 98%; /* Hell auf Secondary */
+    --muted: 217.2 32.6% 17.5%;       /* Gedämpft Dunkel */
+    --muted-foreground: 215 20.2% 65.1%; /* Gedämpfter Text */
+    --accent: 217.2 32.6% 17.5%;      /* Dunkel Akzent */
+    --accent-foreground: 210 40% 98%; /* Hell auf Akzent */
+    --destructive: 0 62.8% 30.6%;     /* Dunkles Rot */
+    --destructive-foreground: 210 40% 98%; /* Hell auf Rot */
+    --border: 217.2 32.6% 17.5%;      /* Dunkle Border */
+    --input: 217.2 32.6% 17.5%;       /* Dunkle Input */
+    --ring: 224.3 76.3% 94.1%;        /* Heller Focus Ring */
+    
+    /* NANO BANANA DARK MODE */
+    --nano-gradient-from: 332 81% 71%; /* Helleres Pink */
+    --nano-gradient-to: 43 96% 65%;    /* Helleres Orange */
+    --nano-header-bg: 222.2 84% 4.9%;  /* Dunkler Header */
+    --nano-page-bg: 222.2 84% 4.9%;    /* Dunkle Page */
+  }
+}
+
+/* BASE BACKGROUND CLASSES */
+.bg-background {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.bg-card {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+}
+
+.bg-muted {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.bg-accent {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* NANO BANANA SPECIFIC BACKGROUNDS */
+.bg-nano-page {
+  background-color: hsl(var(--nano-page-bg));
+  color: hsl(var(--foreground));
+  min-height: 100vh;
+  transition: background-color 0.3s ease;
+}
+
+.bg-nano-header {
+  background-color: hsl(var(--nano-header-bg));
+  border-bottom: 1px solid hsl(var(--border));
+  backdrop-filter: blur(20px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bg-nano-card {
+  background: hsl(var(--card));
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.bg-nano-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+
+/* GRADIENT BACKGROUNDS */
+.bg-gradient-nano {
+  background: linear-gradient(135deg, hsl(var(--nano-gradient-from)) 0%, hsl(var(--nano-gradient-to)) 100%);
+  color: white;
+}
+
+.bg-gradient-nano-text {
+  background: linear-gradient(135deg, hsl(var(--nano-gradient-from)) 0%, hsl(var(--nano-gradient-to)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-subtle {
+  background: linear-gradient(135deg, 
+    hsl(var(--nano-gradient-from) / 0.05) 0%, 
+    hsl(var(--nano-gradient-to) / 0.05) 100%);
+}
+
+/* STATUS BACKGROUNDS */
+.bg-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.bg-warning {
+  background-color: #f59e0b;
+  color: #000000; /* Schwarz für Lesbarkeit */
+}
+
+.bg-error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.bg-info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* LAYOUT CONTAINERS */
+.container-nano {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.container-nano-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.container-nano-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* PAGE LAYOUTS */
+.page-layout {
+  min-height: 100vh;
+  background: hsl(var(--nano-page-bg));
+  padding-bottom: 40px;
+  transition: background-color 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* SECTION BACKGROUNDS */
+.section-hero {
+  background: linear-gradient(135deg, 
+    hsl(var(--nano-gradient-from) / 0.1) 0%, 
+    hsl(var(--nano-gradient-to) / 0.1) 100%);
+  padding: 60px 0;
+}
+
+.section-content {
+  background: hsl(var(--background));
+  padding: 40px 0;
+}
+
+.section-footer {
+  background: hsl(var(--muted));
+  padding: 40px 0;
+  margin-top: 60px;
+  border-top: 1px solid hsl(var(--border));
+}

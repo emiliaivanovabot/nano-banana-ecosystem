@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
+import './UserInspoGallery.css'
 
 interface InspoImage {
   id: string
@@ -28,72 +28,22 @@ export default function UserInspoGallery({ currentUser }: UserInspoGalleryProps)
 
   const loadInspoImages = async () => {
     try {
-      setLoading(refreshing ? false : true)
+      setLoading(true)
       
       console.log('Loading inspiration images from community...')
       
-      // V1 Database Access - Service Role for RLS bypass
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      )
+      // Use API route for server-side database access
+      const response = await fetch(`/api/images/inspiration?excludeUsername=${encodeURIComponent(currentUser?.username || '')}`)
       
-      // Get quality images from all users (excluding current user)
-      const { data, error } = await supabase
-        .from('generations')
-        .select('id, username, prompt, result_image_url, created_at, generation_type, original_filename')
-        .neq('username', currentUser?.username || '') // Exclude current user
-        .eq('status', 'completed')
-        .not('result_image_url', 'is', null) // Ensure image exists
-        .not('username', 'is', null) // Ensure username exists
-        .order('created_at', { ascending: false })
-        .limit(100) // Get more images to ensure fair user distribution
-
-      if (error) {
-        console.error('Error loading inspiration images:', error)
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Error loading inspiration images:', errorData.error)
         return
       }
 
-      // Filter for quality images
-      const qualityImages = data?.filter(img => 
-        img.result_image_url && 
-        img.prompt && 
-        img.prompt.length > 10 && // Relaxed: 10+ chars instead of 15+
-        img.username && 
-        !img.prompt.toLowerCase().includes('test') && 
-        !img.prompt.toLowerCase().includes('debug')
-      ) || []
-
-      // Group images by username for fair distribution
-      const imagesByUser: { [key: string]: InspoImage[] } = {}
-      qualityImages.forEach(img => {
-        if (!imagesByUser[img.username]) {
-          imagesByUser[img.username] = []
-        }
-        imagesByUser[img.username].push(img)
-      })
-
-      // Take max 14 random images per user for more variety in teaser
-      const fairSelection: InspoImage[] = []
-      Object.keys(imagesByUser).forEach(username => {
-        const userImages = imagesByUser[username]
-        // Shuffle user's images and take up to 14
-        const shuffledUserImages = userImages.sort(() => Math.random() - 0.5)
-        fairSelection.push(...shuffledUserImages.slice(0, 14))
-      })
-
-      // Final shuffle of the fair selection and limit to 14 for display
-      const shuffledImages = fairSelection
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 14)
-
-      console.log('🎨 User distribution:', Object.keys(imagesByUser).map(user => 
-        `${user}: ${imagesByUser[user].length} images`
-      ).join(', '))
-      console.log('📊 Final selection: showing', shuffledImages.length, 'images from', 
-        new Set(shuffledImages.map(img => img.username)).size, 'different users')
-
-      setInspoImages(shuffledImages)
+      const { images } = await response.json()
+      console.log('🌟 Inspiration images API response:', { images, count: images?.length })
+      setInspoImages(images || [])
     } catch (error) {
       console.error('Error loading inspiration images:', error)
     } finally {
@@ -121,6 +71,27 @@ export default function UserInspoGallery({ currentUser }: UserInspoGalleryProps)
     setIsFullscreen(false)
   }
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen)
+  }
+
+  const getImageNumber = (filename: string, generationType: string) => {
+    if (!filename || generationType === 'single') return null
+    
+    // Extract number from filename like "nano-banana-4x-3-1764109853661.webp"
+    const match = filename.match(/nano-banana-\w+-(\d+)-\d+\.(webp|jpg|png|avif)/)
+    if (match) {
+      const imageNum = parseInt(match[1])
+      const total = generationType === '4x' ? 4 : 10
+      return { current: imageNum, total }
+    }
+    return null
+  }
+
+  const openImage = (imageUrl: string) => {
+    window.open(imageUrl, '_blank')
+  }
+
   const copyPrompt = (prompt: string) => {
     navigator.clipboard.writeText(prompt).then(() => {
       console.log('✅ Prompt copied to clipboard')
@@ -131,198 +102,162 @@ export default function UserInspoGallery({ currentUser }: UserInspoGalleryProps)
     })
   }
 
-  if (loading) {
-    return (
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(15px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '20px',
-        padding: '20px',
-        textAlign: 'center'
-      }}>
-        <div style={{ color: 'white', fontSize: '14px' }}>
-          Loading inspiration...
-        </div>
-      </div>
-    )
+  const handleModalClick = (e: React.MouseEvent) => {
+    // Close modal when clicking outside the content
+    if ((e.target as HTMLElement).className === 'image-modal') {
+      closeModal()
+    }
   }
+
+  const handleKeyPress = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      closeModal()
+    }
+  }
+
+  // Utility function to get user display name from username
+  const getUserDisplayName = (username: string) => {
+    if (!username) return 'Community'
+    // Convert username to display format (e.g., "emilia.berlin" -> "emilia.berlin")
+    return username
+  }
+
+  useEffect(() => {
+    if (selectedImage) {
+      document.addEventListener('keydown', handleKeyPress)
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.removeEventListener('keydown', handleKeyPress)
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+      document.body.style.overflow = 'unset'
+    }
+  }, [selectedImage])
 
   return (
     <>
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(15px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '20px',
-        padding: '20px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px'
-        }}>
-          <h3 style={{
-            margin: 0,
-            color: 'white',
-            fontSize: '16px',
-            fontWeight: '600'
-          }}>
-            💡 Community Inspiration
-          </h3>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              color: 'white',
-              fontSize: '12px',
-              cursor: refreshing ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {refreshing ? '🔄' : '↻'} Refresh
-          </button>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-          gap: '8px'
-        }}>
-          {inspoImages.slice(0, 14).map((image, index) => (
-            <div
-              key={image.id}
-              onClick={() => handleImageClick(image)}
-              style={{
-                aspectRatio: '1',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                background: 'rgba(255, 255, 255, 0.1)',
-                position: 'relative'
-              }}
-            >
-              <img
-                src={image.result_image_url}
-                alt={`Inspiration ${index + 1}`}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                loading="lazy"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div style={{
-          marginTop: '12px',
-          textAlign: 'center'
-        }}>
-          <Link 
+      <div className="user-inspo-gallery">
+        <div className="inspo-header">
+          <h3>Community Inspiration</h3>
+          <div className="inspo-subtitle">Inspiration der Community</div>
+          <a 
             href="/inspiration"
-            style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              textDecoration: 'none',
-              fontSize: '12px'
-            }}
+            className="inspiration-link-button"
+            title="Zur vollständigen Community Galerie"
           >
-            → Alle Community Bilder ansehen
-          </Link>
+            <span className="inspiration-icon">🎨</span>
+            Zur Galerie
+          </a>
         </div>
+        
+        {loading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Lade Inspiration...</p>
+          </div>
+        ) : inspoImages.length === 0 ? (
+          <div className="no-images-container">
+            <p>Keine Inspirationen verfügbar. Die Community erstellt gerade neue Kunstwerke!</p>
+          </div>
+        ) : (
+          <div className="inspo-scroll">
+            {inspoImages.map((img) => (
+              <img
+                key={img.id}
+                src={img.result_image_url}
+                className="inspo-thumbnail"
+                onClick={() => handleImageClick(img)}
+                loading="lazy"
+                alt={`Inspiration by ${getUserDisplayName(img.username)}`}
+                title={`${getUserDisplayName(img.username)} - ${new Date(img.created_at).toLocaleDateString()}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Modal */}
+      {/* Modal für großes Bild */}
       {selectedImage && (
-        <div
-          onClick={closeModal}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.9)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'white',
-              borderRadius: '12px',
-              padding: '20px',
-              maxWidth: '500px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}
-          >
-            <img
-              src={selectedImage.result_image_url}
-              alt="Inspiration"
-              style={{
-                width: '100%',
-                height: 'auto',
-                borderRadius: '8px',
-                marginBottom: '16px'
-              }}
+        <div className="image-modal" onClick={handleModalClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h4>
+                Community Inspiration
+                {(() => {
+                  const imageNumber = getImageNumber(selectedImage.original_filename, selectedImage.generation_type);
+                  return imageNumber ? (
+                    <span style={{ 
+                      fontWeight: 'normal', 
+                      fontSize: '0.8em', 
+                      color: '#666',
+                      marginLeft: '8px'
+                    }}>
+                      {imageNumber.current} von {imageNumber.total}
+                    </span>
+                  ) : null;
+                })()}
+              </h4>
+              <button 
+                className="close-button"
+                onClick={closeModal}
+                aria-label="Schließen"
+              >
+                ✖
+              </button>
+            </div>
+            
+            <img 
+              src={selectedImage.result_image_url} 
+              alt="Community Inspiration"
+              className={isFullscreen ? "modal-image fullscreen-image" : "modal-image"}
+              onClick={toggleFullscreen}
+              style={{ cursor: 'pointer' }}
             />
             
-            <div style={{ marginBottom: '12px' }}>
-              <strong>By:</strong> {selectedImage.username}
+            <div className="modal-info">
+              <p className="modal-date">
+                Von {getUserDisplayName(selectedImage.username)} • {new Date(selectedImage.created_at).toLocaleString('de-DE')}
+              </p>
+              {selectedImage.prompt && (
+                <p className="modal-prompt">
+                  <strong>Prompt:</strong> {selectedImage.prompt}
+                </p>
+              )}
             </div>
             
-            <div style={{ marginBottom: '16px' }}>
-              <strong>Prompt:</strong>
-              <div style={{
-                background: '#f5f5f5',
-                padding: '8px',
-                borderRadius: '4px',
-                fontSize: '14px',
-                marginTop: '4px'
-              }}>
-                {selectedImage.prompt}
+            <div className="modal-actions">
+              <div className="action-buttons-row">
+                <button 
+                  className="download-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openImage(selectedImage.result_image_url);
+                  }}
+                >
+                  Im neuen Tab öffnen
+                </button>
+                {selectedImage.prompt && (
+                  <button 
+                    className="copy-prompt-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyPrompt(selectedImage.prompt);
+                    }}
+                  >
+                    {copySuccess ? '✅ Copied!' : '📋 Copy Prompt'}
+                  </button>
+                )}
               </div>
+              <button 
+                className="close-modal-button"
+                onClick={closeModal}
+              >
+                Schließen
+              </button>
             </div>
-
-            <button
-              onClick={() => copyPrompt(selectedImage.prompt)}
-              style={{
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                marginRight: '8px'
-              }}
-            >
-              {copySuccess ? '✅ Copied!' : '📋 Copy Prompt'}
-            </button>
-
-            <button
-              onClick={closeModal}
-              style={{
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer'
-              }}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

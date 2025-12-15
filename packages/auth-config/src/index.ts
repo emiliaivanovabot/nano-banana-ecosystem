@@ -50,9 +50,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Auth provider component
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+interface AuthProviderProps {
+  children: React.ReactNode
+  initialUser?: User | null
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, initialUser }) => {
+  const [user, setUser] = useState<User | null>(initialUser || null)
+  const [loading, setLoading] = useState(!initialUser)
   const supabase = createSupabaseClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey)
 
   // Initialize V1 auth state
@@ -61,18 +66,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initializeAuth = async () => {
       try {
-        // Check for stored V1 user session
+        // If we have an initialUser from server-side, use it and store it
+        if (initialUser && mounted) {
+          localStorage.setItem('v1_user', JSON.stringify(initialUser))
+          console.log('✅ Using server-side initialUser:', initialUser.username)
+          if (mounted) setLoading(false)
+          return
+        }
+
+        // Fallback: check for stored V1 user session
         const storedUser = localStorage.getItem('v1_user')
         
         if (mounted && storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser)
-            // For V1 compatibility, trust stored user session
-            // TODO: Add server-side session validation in future
             setUser(parsedUser)
+            if (mounted) setLoading(false)
+            return
           } catch (e) {
             console.error('Invalid stored user session:', e)
             localStorage.removeItem('v1_user')
+          }
+        }
+
+        // Final fallback: check Supabase session (client-side)
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user && mounted) {
+          // Fetch user profile from users table
+          const { data: userProfile } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          if (userProfile) {
+            setUser(userProfile)
+            // Store for next time
+            localStorage.setItem('v1_user', JSON.stringify(userProfile))
           }
         }
         
@@ -115,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false
       subscription?.unsubscribe()
     }
-  }, [])
+  }, [initialUser])
 
   const login = async (username: string, password: string) => {
     try {

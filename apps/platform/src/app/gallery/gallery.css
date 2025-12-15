@@ -32,3 +32,247 @@
   color: hsl(var(--muted-foreground));
   font-family: 'Space Grotesk', sans-serif;
 }
+
+/* Modal Design - From Inspiration Page */
+.modal-content {
+  background: white;
+  padding: 0;
+  border-radius: 16px;
+  max-width: min(90vw, 600px);
+  max-height: min(85vh, 85dvh);
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(236, 72, 153, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+  flex-shrink: 0;
+}
+
+.modal-header h4 {
+  margin: 0;
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  color: #666;
+  line-height: 1;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 40vh;
+  object-fit: contain;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  cursor: zoom-in;
+  display: block;
+  margin: 0 auto;
+}
+
+.modal-info {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.modal-date {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 0.9rem;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.modal-prompt {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-family: 'Space Grotesk', sans-serif;
+  max-height: 5.6em; /* 4 Zeilen bei line-height 1.4 */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.modal-actions {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  flex-shrink: 0;
+}
+
+.action-buttons-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-actions button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+}
+
+.modal-actions button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.download-button {
+  background: #f59e0b;
+  color: white;
+  flex: 1;
+}
+
+.download-button:hover {
+  background: #e5920a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.copy-prompt-button {
+  background: rgb(177, 82, 224);
+  color: white;
+  flex: 1;
+}
+
+.copy-prompt-button:hover {
+  background: rgb(157, 62, 204);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(177, 82, 224, 0.3);
+}
+
+.close-modal-button {
+  background: #6c757d;
+  color: white;
+  width: 100%;
+}
+
+.close-modal-button:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(108, 117, 125, 0.3);
+}
+
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(255, 107, 157, 0.2);
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 201, 71, 0.1) 100%);
+    border-bottom: 1px solid #333;
+  }
+
+  .modal-header h4 {
+    background: linear-gradient(135deg, #ff6b9d 0%, #ffc947 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .close-button {
+    color: #a0a0a0;
+  }
+
+  .close-button:hover {
+    background: #2a2a2a;
+    color: #e0e0e0;
+  }
+
+  .modal-image {
+    background: #0a0a0a;
+  }
+
+  .modal-info {
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+  }
+
+  .modal-date {
+    color: #a0a0a0;
+  }
+
+  .modal-prompt {
+    color: #e5e5e5;
+    max-height: 5.6em; /* 4 Zeilen bei line-height 1.4 */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .modal-actions {
+    background: #1a1a1a;
+  }
+
+  .download-button {
+    background: #ffc947;
+  }
+
+  .download-button:hover {
+    background: #e6b340;
+  }
+
+  .copy-prompt-button {
+    background: rgb(197, 102, 244);
+  }
+
+  .copy-prompt-button:hover {
+    background: rgb(177, 82, 224);
+  }
+
+  .close-modal-button {
+    background: #444;
+    color: #e5e5e5;
+  }
+
+  .close-modal-button:hover {
+    background: #555;
+  }
+}

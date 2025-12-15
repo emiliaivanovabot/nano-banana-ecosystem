@@ -1,0 +1,1269 @@
+/* Community Inspiration Page - Mobile Optimized */
+.inspiration-page {
+  min-height: 100vh;
+  background: #fafafa;
+  padding-bottom: 40px;
+  transition: background-color 0.3s ease;
+  /* Enhanced mobile scrolling optimizations */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  /* Force GPU acceleration for smoother scrolling */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* FIXED: Floating Back Button - Portal-based viewport positioning */
+.floating-back-button {
+  /* Portal positioning - these are now redundant with inline styles but kept for fallback */
+  position: fixed !important;
+  top: -1px !important;
+  left: 1px !important;
+  z-index: 10000 !important;
+  
+  /* Match original button styling */
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  
+  /* 50% transparent - HALB! */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px); /* Safari support */
+  color: rgba(255, 255, 255, 0.95);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  /* Smooth transitions */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Hidden by default - Portal ensures viewport positioning */
+  opacity: 0;
+  pointer-events: none !important; /* Overridden by visible class */
+  visibility: hidden;
+  
+  /* Initial state - slightly offset for smooth animation */
+  transform: translateY(-10px) scale(0.95);
+  
+  /* Mobile touch optimization */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  /* Minimum touch target size (44px) */
+  min-height: 44px;
+  min-width: 44px;
+  
+  /* CRITICAL: Reset any transforms that could interfere with fixed positioning */
+  translate: none !important;
+  rotate: none !important;
+  scale: none !important;
+}
+
+.floating-back-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 1);
+  transform: translateY(6px) scale(1);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+}
+
+/* Show floating button with smooth entrance animation */
+.floating-back-button.visible {
+  opacity: 1;
+  pointer-events: auto !important; /* Override the none from base class */
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  
+  /* Subtle entrance animation */
+  animation: slideInSticky 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Mobile-optimized floating button positioning */
+@media (max-width: 768px) {
+  .floating-back-button {
+    /* Smaller padding for mobile */
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    
+    /* Enhanced mobile shadows */
+    box-shadow: 
+      0 6px 24px rgba(0, 0, 0, 0.25),
+      0 1px 6px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  
+  .floating-back-button:hover {
+    transform: translateY(-1px) scale(1.02);
+  }
+}
+
+@keyframes slideInSticky {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+    filter: blur(2px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.02);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.inspiration-header {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.title-section h1 {
+  margin: 0 0 8px 0;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.loading-container {
+  padding: 60px 20px;
+  text-align: center;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Progressive loading progress bar */
+.progress-container {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ec4899 0%, #f59e0b 100%);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.progress-text {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Background Loading Indicator */
+.background-loading-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  font-size: 0.85rem;
+  color: #666;
+  animation: slideInFromBottom 0.3s ease;
+}
+
+.background-loading-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.background-loading-indicator p {
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-images-container {
+  padding: 20px 15px;
+  text-align: center;
+  color: #666;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border-radius: 12px;
+  margin: 20px;
+}
+
+.no-images-container p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.refresh-pool-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.refresh-pool-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.refresh-pool-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tetris-Style Grid mit intelligenter Platzierung */
+.masonry-gallery {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 Spalten für flexible Aufteilung */
+  grid-auto-rows: 200px; /* Basis-Zellenhöhe */
+  gap: 16px;
+  grid-auto-flow: dense; /* Tetris-Effekt - füllt Lücken */
+}
+
+.masonry-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: white;
+  display: block;
+  width: 100%;
+  /* GPU acceleration for better mobile performance */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Lazy loading states */
+.masonry-item:not(.loaded) {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.masonry-item.loaded {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tetris Grid Spans basierend auf Bildformat */
+.masonry-item.square {
+  grid-column: span 2; /* 2 Spalten breit */
+  grid-row: span 1; /* 1 Reihe hoch */
+}
+
+.masonry-item.landscape {
+  grid-column: span 3; /* 3 Spalten breit */
+  grid-row: span 1; /* 1 Reihe hoch */
+}
+
+.masonry-item.portrait {
+  grid-column: span 2; /* 2 Spalten breit */
+  grid-row: span 2; /* 2 Reihen hoch */
+}
+
+/* Spezielle Größen für Abwechslung */
+.masonry-item.portrait.large {
+  grid-column: span 2;
+  grid-row: span 3; /* 3 Reihen hoch - dein 1:3 Beispiel */
+}
+
+.masonry-item.landscape.large {
+  grid-column: span 4; /* 4 Spalten breit */
+  grid-row: span 2; /* 2 Reihen hoch */
+}
+
+/* Grid Size Classes - Tetris Style */
+.masonry-item.size-1x1 {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.masonry-item.size-2x1 {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.masonry-item.size-1x2 {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.masonry-item.size-2x2 {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.masonry-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.masonry-item:hover .image-overlay {
+  opacity: 1;
+}
+
+.masonry-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.masonry-item:hover .masonry-image {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+  padding: 20px 12px 12px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.image-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.username {
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.date {
+  opacity: 0.8;
+  font-size: 0.8rem;
+}
+
+/* Modal Styles - Inherit from existing but enhanced */
+.image-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+  overflow: hidden;
+}
+
+/* Mobile-Optimized Viewport Modal - GUARANTEED viewport centering */
+.mobile-viewport-modal {
+  /* CRITICAL: Fixed positioning relative to viewport, not document */
+  position: fixed !important;
+  
+  /* Force positioning to viewport edges - ignores scroll */
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  
+  /* Explicit viewport dimensions */
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important; /* Dynamic viewport height for mobile */
+  
+  /* Perfect centering with flexbox */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  /* Visual styling */
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  
+  /* Highest z-index to be above everything */
+  z-index: 999999 !important;
+  
+  /* Reset all positioning that could interfere */
+  transform: none !important;
+  translate: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* Prevent any scrolling within modal overlay */
+  overflow: hidden !important;
+  overscroll-behavior: contain !important;
+  
+  /* Prevent touch interactions from affecting underlying content */
+  touch-action: none !important;
+  
+  /* iOS Safari specific viewport handling */
+  -webkit-overflow-scrolling: auto !important;
+  
+  /* Smooth animation */
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+/* Mobile browser compatibility for perfect viewport centering */
+.mobile-viewport-modal {
+  /* Multiple height declarations for different browsers */
+  height: 100vh !important; /* Standard browsers */
+  height: 100dvh !important; /* Dynamic viewport for mobile */
+  height: -webkit-fill-available !important; /* iOS Safari fallback */
+  
+  /* Webkit specific positioning fixes */
+  -webkit-transform: none !important;
+  -webkit-backface-visibility: hidden;
+  
+  /* Force layer creation for optimal rendering */
+  will-change: auto;
+  contain: layout style paint;
+}
+
+/* Body styles when modal is open - Mobile optimized */
+body.modal-open {
+  overflow: hidden !important;
+  /* Remove position fixed that causes viewport issues */
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  /* Prevent momentum scrolling on iOS */
+  -webkit-overflow-scrolling: auto !important;
+  /* Prevent touch actions that could cause scrolling */
+  touch-action: none !important;
+  /* Prevent elastic bounce on iOS */
+  overscroll-behavior: contain !important;
+}
+
+/* Additional safety: Prevent any scrolling when modal is active */
+.mobile-viewport-modal,
+.mobile-viewport-modal * {
+  /* Override any scroll behaviors */
+  overscroll-behavior: none !important;
+  /* Prevent momentum scrolling on iOS */
+  -webkit-overflow-scrolling: auto !important;
+  /* Prevent elastic bounce */
+  overscroll-behavior-y: contain !important;
+  overscroll-behavior-x: contain !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalFadeIn {
+  from { 
+    opacity: 0; 
+    backdrop-filter: blur(0px);
+  }
+  to { 
+    opacity: 1; 
+    backdrop-filter: blur(4px);
+  }
+}
+
+.modal-content {
+  background: white;
+  padding: 0;
+  border-radius: 16px;
+  
+  /* Mobile-optimized sizing */
+  max-width: min(90vw, 600px);
+  max-height: min(90vh, 90dvh);
+  width: 90vw;
+  
+  display: flex;
+  flex-direction: column;
+  
+  /* Premium shadows */
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(236, 72, 153, 0.1);
+  
+  /* Smooth entrance animation */
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* Controlled scrolling for long content */
+  overflow: hidden;
+  
+  /* Positioning */
+  position: relative;
+  
+  /* Visual enhancements */
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  /* Performance optimizations */
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  
+  /* Interaction feedback */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  /* Mobile touch optimization */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.modal-header h4 {
+  margin: 0;
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  cursor: zoom-in;
+}
+
+.fullscreen-image {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  object-fit: contain !important;
+  background: rgba(0, 0, 0, 0.95) !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  cursor: zoom-out !important;
+}
+
+.modal-info {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-date {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 0.9rem;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.modal-prompt {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.modal-prompt strong {
+  color: #555;
+}
+
+.modal-actions {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #f8f9fa;
+}
+
+.action-buttons-row {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-actions button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  
+  /* Premium button enhancements */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+  
+  /* Add subtle gradient overlay for premium feel */
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+/* Premium button active states */
+.modal-actions button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.download-button {
+  background: #f59e0b;
+  color: white;
+  flex: 1;
+}
+
+.download-button:hover {
+  background: #e5920a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+.copy-prompt-button {
+  background: rgb(177, 82, 224);
+  color: white;
+  flex: 1;
+}
+
+.copy-prompt-button:hover {
+  background: rgb(157, 62, 204);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(177, 82, 224, 0.3);
+}
+
+.close-modal-button {
+  background: #6c757d;
+  color: white;
+  width: 100%;
+}
+
+.close-modal-button:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(108, 117, 125, 0.3);
+}
+
+/* Responsive Grid Design */
+@media (max-width: 1200px) {
+  .masonry-gallery {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  
+  /* Kleinere Features auf mittleren Screens */
+  .masonry-item.size-2x2 {
+    grid-column: span 2;
+    grid-row: span 1; /* Reduziert auf 2x1 */
+  }
+}
+
+@media (max-width: 768px) {
+  .inspiration-header {
+    padding: 15px 0;
+  }
+
+  .header-content {
+    padding: 0 16px;
+  }
+
+  .title-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Mobile Touch Optimizations */
+  .masonry-item {
+    /* Larger touch targets for mobile */
+    min-height: 44px;
+    /* iOS momentum scrolling optimization */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Prevent tap highlight */
+    -webkit-tap-highlight-color: transparent;
+    /* Smooth touch interactions */
+    -webkit-touch-callout: none;
+  }
+
+  .masonry-item:active {
+    /* Subtle touch feedback */
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  .masonry-gallery {
+    grid-template-columns: repeat(4, 1fr); /* Mobile: 4 Spalten */
+    grid-auto-rows: 100px; /* Kleinere Zellen auf Mobile */
+    gap: 8px;
+    margin: 20px auto;
+    padding: 0 16px;
+    /* iOS Safari viewport fix */
+    width: calc(100vw - 32px);
+    max-width: calc(100% - 32px);
+    /* Prevent horizontal scroll */
+    overflow-x: hidden;
+    /* Momentum scrolling for iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Mobile Tetris Pieces - optimiert für 4-Spalten Grid */
+  .masonry-item.square {
+    grid-column: span 2; /* 2 Spalten - passt 2 pro Reihe */
+    grid-row: span 1;
+  }
+  
+  .masonry-item.landscape {
+    grid-column: span 2; /* 2 Spalten - passt 2 pro Reihe */
+    grid-row: span 1;
+  }
+  
+  .masonry-item.portrait {
+    grid-column: span 1; /* 1 Spalte - passt 4 pro Reihe */
+    grid-row: span 2; /* 2 Reihen hoch für Portrait-Format */
+  }
+  
+  .masonry-item.portrait.large {
+    grid-column: span 2; /* 2 Spalten */
+    grid-row: span 2; /* 2 Reihen - nicht zu hoch */
+  }
+  
+  .masonry-item.landscape.large {
+    grid-column: span 3; /* 3 Spalten statt 4 - lässt Platz für andere */
+    grid-row: span 1;
+  }
+
+  /* Mobile: Optimierte Size Classes für Multi-Column Layout */
+  .masonry-item.size-2x2 {
+    grid-column: span 2; /* 2 Spalten - passt 2 pro Reihe */
+    grid-row: span 2; /* Featured Items bleiben prominent */
+  }
+  
+  .masonry-item.size-2x1 {
+    grid-column: span 2; /* 2 Spalten - passt 2 pro Reihe */
+    grid-row: span 1; /* Querformat */
+  }
+
+  .masonry-item.size-1x2 {
+    grid-column: span 1; /* 1 Spalte - passt 4 pro Reihe */
+    grid-row: span 2; /* Portrait hoch */
+  }
+  
+  .masonry-item.size-1x1 {
+    grid-column: span 1; /* 1 Spalte - passt 4 pro Reihe */
+    grid-row: span 1; /* Kompakte Squares */
+  }
+
+  /* Mobile Modal Optimization */
+  .modal-content {
+    max-width: 95vw;
+    max-height: min(95vh, 95dvh);
+    width: 95vw;
+    border-radius: 12px;
+    
+    /* Enhanced mobile sizing */
+    min-height: auto;
+    
+    /* Better mobile performance */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Mobile keyboard accommodation */
+  .mobile-viewport-modal {
+    /* Adjust for virtual keyboard on mobile */
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: -webkit-fill-available !important;
+  }
+
+  .modal-header {
+    padding: 12px 15px;
+  }
+
+  .modal-header h4 {
+    font-size: 1rem;
+  }
+
+  .modal-image {
+    max-height: 50vh;
+  }
+
+  .modal-info {
+    padding: 12px 15px;
+  }
+
+  .modal-actions {
+    padding: 15px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-buttons-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .action-buttons-row .download-button,
+  .action-buttons-row .copy-prompt-button {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .modal-actions .close-modal-button {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  /* Mobile Background Loading Indicator */
+  .background-loading-indicator {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .background-loading-indicator p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry-gallery {
+    grid-template-columns: repeat(3, 1fr); /* 3 Spalten für sehr kleine Screens */
+    grid-auto-rows: 100px;
+    gap: 6px;
+  }
+
+  /* Sehr kleine Screens: Kompakte aber vielfältige Layout */
+  .masonry-item.square,
+  .masonry-item.landscape {
+    grid-column: span 1; /* 1 Spalte - passt 3 pro Reihe */
+    grid-row: span 1;
+  }
+  
+  .masonry-item.portrait {
+    grid-column: span 1; /* 1 Spalte */
+    grid-row: span 2; /* 2 Reihen hoch */
+  }
+  
+  .masonry-item.portrait.large,
+  .masonry-item.landscape.large {
+    grid-column: span 2; /* 2 Spalten für Features */
+    grid-row: span 1;
+  }
+
+  /* Size Classes für sehr kleine Screens */
+  .masonry-item.size-2x2 {
+    grid-column: span 2; /* Feature Items bleiben prominent */
+    grid-row: span 1;
+  }
+  
+  .masonry-item.size-2x1 {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  
+  .masonry-item.size-1x2 {
+    grid-column: span 1;
+    grid-row: span 2;
+  }
+  
+  .masonry-item.size-1x1 {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .title-section h1 {
+    font-size: 1.3rem;
+  }
+
+  .back-link {
+    font-size: 0.85rem;
+  }
+
+  /* Sehr kleine Mobile Modal */
+  .modal-header h4 {
+    font-size: 0.9rem;
+  }
+
+  .modal-prompt {
+    font-size: 0.8rem;
+  }
+
+  .modal-date {
+    font-size: 0.8rem;
+  }
+}
+
+/* Dark Mode - System-based */
+@media (prefers-color-scheme: dark) {
+  .inspiration-page {
+    background: #0a0a0a;
+    color: #e5e5e5;
+  }
+
+  .inspiration-header {
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .back-link {
+    color: #a0a0a0;
+  }
+
+  .back-link:hover {
+    color: #e5e5e5;
+  }
+
+  .title-section h1 {
+    background: linear-gradient(135deg, #ff6b9d 0%, #ffc947 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: #a0a0a0;
+  }
+
+  .loading-container {
+    color: #a0a0a0;
+  }
+
+  .loading-spinner {
+    border: 4px solid #333;
+    border-top: 4px solid #ff6b9d;
+  }
+
+  .no-images-container {
+    color: #a0a0a0;
+  }
+
+  .masonry-item {
+    background: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .masonry-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  }
+
+  .image-overlay {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+  }
+
+  .username {
+    color: #fff;
+  }
+
+  .date {
+    color: #ccc;
+  }
+
+  /* Dark Mode Modal */
+  .image-modal,
+  .mobile-viewport-modal {
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  .modal-content {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(255, 107, 157, 0.2);
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 201, 71, 0.1) 100%);
+    border-bottom: 1px solid #333;
+  }
+
+  .modal-header h4 {
+    background: linear-gradient(135deg, #ff6b9d 0%, #ffc947 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .close-button {
+    color: #a0a0a0;
+  }
+
+  .close-button:hover {
+    background: #2a2a2a;
+    color: #e5e5e5;
+  }
+
+  .modal-image {
+    background: #0a0a0a;
+  }
+
+  .modal-info {
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+  }
+
+  .modal-date {
+    color: #a0a0a0;
+  }
+
+  .modal-prompt {
+    color: #e5e5e5;
+  }
+
+  .modal-prompt strong {
+    color: #ccc;
+  }
+
+  .modal-actions {
+    background: #0f0f0f;
+  }
+
+  .download-button {
+    background: #ffc947;
+  }
+
+  .download-button:hover {
+    background: #e6b340;
+  }
+
+  .copy-prompt-button {
+    background: rgb(197, 102, 244);
+  }
+
+  .copy-prompt-button:hover {
+    background: rgb(177, 82, 224);
+  }
+
+  .close-modal-button {
+    background: #444;
+    color: #e5e5e5;
+  }
+
+  .close-modal-button:hover {
+    background: #555;
+  }
+
+  /* Dark Mode Background Loading Indicator */
+  .background-loading-indicator {
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid rgba(255, 107, 157, 0.3);
+    color: #e5e5e5;
+  }
+
+  .mini-spinner {
+    border: 2px solid #333;
+    border-top: 2px solid #ff6b9d;
+  }
+
+  /* Dark Mode Floating Button */
+  .floating-back-button {
+    background: rgba(26, 26, 26, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: rgba(229, 229, 229, 0.95);
+    border: 1px solid rgba(229, 229, 229, 0.1);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(229, 229, 229, 0.08);
+  }
+
+  .floating-back-button:hover {
+    background: rgba(42, 42, 42, 0.95);
+    color: rgba(229, 229, 229, 1);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.8),
+      0 4px 12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(229, 229, 229, 0.12);
+  }
+}

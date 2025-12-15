@@ -19,7 +19,8 @@
     "@repo/constants": "*",
     "@supabase/supabase-js": "^2.45.4",
     "openai": "^4.65.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@nano-banana/ui-components": "file:../../packages/ui-components"
   },
   "engines": {
     "node": ">=18.0.0",

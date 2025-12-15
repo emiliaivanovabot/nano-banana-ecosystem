@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
+import './RecentImagesHistory.css'
 
 interface RecentImage {
   id: string
@@ -33,28 +33,20 @@ export default function RecentImagesHistory({ currentUser }: RecentImagesHistory
       try {
         setLoading(true)
         
-        console.log('Loading recent images for:', currentUser?.username)
+        console.log('🔍 RecentImagesHistory currentUser:', { currentUser, username: currentUser?.username, isNull: currentUser === null })
         
-        // V1 Database Access - Service Role for RLS bypass
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        )
+        // Use API route for server-side database access
+        const response = await fetch(`/api/images/recent?username=${encodeURIComponent(currentUser.username)}`)
         
-        const { data, error } = await supabase
-          .from('generations')
-          .select('*')
-          .eq('username', currentUser.username)
-          .eq('status', 'completed')
-          .order('created_at', { ascending: false })
-          .limit(20)
-
-        if (error) {
-          console.error('Error loading recent images:', error)
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error loading recent images:', errorData.error)
           return
         }
 
-        setRecentImages(data || [])
+        const { images } = await response.json()
+        console.log('🖼️ Recent images API response:', { images, count: images?.length })
+        setRecentImages(images || [])
       } catch (error) {
         console.error('Error loading recent images:', error)
       } finally {
@@ -127,16 +119,23 @@ export default function RecentImagesHistory({ currentUser }: RecentImagesHistory
 
   if (loading) {
     return (
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(15px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '20px',
-        padding: '20px',
-        textAlign: 'center'
-      }}>
-        <div style={{ color: 'white', fontSize: '14px' }}>
+      <div className="recent-images-history">
+        <div className="recent-images-header">
+          <h3>🎯 Your Nano Bananas</h3>
+        </div>
+        <div className="loading-container">
           Loading your recent images...
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentUser?.username) {
+    return (
+      <div className="recent-images-history">
+        <h3>Deine letzten 20 Bilder</h3>
+        <div className="no-images-container">
+          <p>Benutzer wird geladen...</p>
         </div>
       </div>
     )
@@ -144,205 +143,123 @@ export default function RecentImagesHistory({ currentUser }: RecentImagesHistory
 
   return (
     <>
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(15px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '20px',
-        padding: '20px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px'
-        }}>
-          <h3 style={{
-            margin: 0,
-            color: 'white',
-            fontSize: '16px',
-            fontWeight: '600'
-          }}>
-            📸 Deine letzten Bilder
-          </h3>
-          <Link 
-            href="/gallery"
-            style={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              textDecoration: 'none',
-              fontSize: '12px'
-            }}
+      <div className="recent-images-history">
+        <div className="recent-images-header">
+          <h3>Deine letzten 20 Bilder</h3>
+          <a 
+            href="/gallery" 
+            className="gallery-link-button"
           >
-            → Alle ansehen
-          </Link>
+            Zur Galerie
+          </a>
         </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-          gap: '8px'
-        }}>
-          {recentImages.slice(0, 14).map((image, index) => {
-            const imageNumber = getImageNumber(image.original_filename, image.generation_type)
-            
-            return (
-              <div
-                key={image.id}
-                onClick={() => openImageModal(image)}
-                style={{
-                  aspectRatio: '1',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  position: 'relative'
-                }}
-              >
-                <img
-                  src={image.result_image_url}
-                  alt={`Recent ${index + 1}`}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                  loading="lazy"
-                />
-                {imageNumber && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '4px',
-                    right: '4px',
-                    background: 'rgba(0, 0, 0, 0.7)',
-                    color: 'white',
-                    fontSize: '10px',
-                    padding: '2px 4px',
-                    borderRadius: '3px'
-                  }}>
-                    {imageNumber.current}/{imageNumber.total}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-
-        {recentImages.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            color: 'rgba(255, 255, 255, 0.6)',
-            fontSize: '14px',
-            padding: '20px'
-          }}>
-            Noch keine Bilder generiert. Starte deine erste Generation! 🍌
+        
+        {loading ? (
+          <div className="loading-container">
+            <p>Lade Bilder...</p>
+          </div>
+        ) : recentImages.length === 0 ? (
+          <div className="no-images-container">
+            <p>Noch keine Bilder generiert. Erstelle dein erstes Bild!</p>
+          </div>
+        ) : (
+          <div className="thumbnails-scroll">
+            {recentImages.map((img) => (
+              <img
+                key={img.id}
+                src={img.result_image_url}
+                className="thumbnail"
+                onClick={() => openImageModal(img)}
+                loading="lazy"
+                alt={`Generated image from ${img.created_at}`}
+                title={`${img.generation_type} - ${new Date(img.created_at).toLocaleDateString()}`}
+              />
+            ))}
           </div>
         )}
+
       </div>
 
-      {/* Modal */}
+      {/* Modal für großes Bild */}
       {selectedImage && (
-        <div
-          className="image-modal"
-          onClick={handleModalClick}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.9)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'white',
-              borderRadius: '12px',
-              padding: '20px',
-              maxWidth: '500px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflow: 'auto'
-            }}
-          >
-            <img
-              src={selectedImage.result_image_url}
-              alt="Recent image"
-              style={{
-                width: '100%',
-                height: 'auto',
-                borderRadius: '8px',
-                marginBottom: '16px',
-                cursor: isFullscreen ? 'zoom-out' : 'zoom-in'
-              }}
+        <div className="image-modal" onClick={handleModalClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h4>
+                {selectedImage.generation_type === 'single' ? 'Einzelne' :
+                 selectedImage.generation_type === '4x' ? '4x' : '10x'} Generierung
+                {(() => {
+                  const imageNumber = getImageNumber(selectedImage.original_filename, selectedImage.generation_type);
+                  return imageNumber ? (
+                    <span style={{ 
+                      fontWeight: 'normal', 
+                      fontSize: '0.8em', 
+                      color: '#666',
+                      marginLeft: '8px'
+                    }}>
+                      {imageNumber.current} von {imageNumber.total}
+                    </span>
+                  ) : null;
+                })()}
+              </h4>
+              <button 
+                className="close-button"
+                onClick={closeModal}
+                aria-label="Schließen"
+              >
+                ✖
+              </button>
+            </div>
+            
+            <img 
+              src={selectedImage.result_image_url} 
+              alt="Generated Image"
+              className={isFullscreen ? "modal-image fullscreen-image" : "modal-image"}
               onClick={toggleFullscreen}
+              style={{ cursor: 'pointer' }}
             />
             
-            <div style={{ marginBottom: '12px' }}>
-              <strong>Generated:</strong> {new Date(selectedImage.created_at).toLocaleString()}
+            <div className="modal-info">
+              <p className="modal-date">
+                {new Date(selectedImage.created_at).toLocaleString('de-DE')}
+              </p>
+              {selectedImage.prompt && (
+                <p className="modal-prompt">
+                  <strong>Prompt:</strong> {selectedImage.prompt}
+                </p>
+              )}
             </div>
             
-            <div style={{ marginBottom: '16px' }}>
-              <strong>Prompt:</strong>
-              <div style={{
-                background: '#f5f5f5',
-                padding: '8px',
-                borderRadius: '4px',
-                fontSize: '14px',
-                marginTop: '4px'
-              }}>
-                {selectedImage.prompt}
+            <div className="modal-actions">
+              <div className="action-buttons-row">
+                <button 
+                  className="download-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openImage(selectedImage.result_image_url);
+                  }}
+                >
+                  Im neuen Tab öffnen
+                </button>
+                {selectedImage.prompt && (
+                  <button 
+                    className="copy-prompt-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyPrompt(selectedImage.prompt);
+                    }}
+                  >
+                    {copySuccess ? '✅ Copied!' : '📋 Copy Prompt'}
+                  </button>
+                )}
               </div>
+              <button 
+                className="close-modal-button"
+                onClick={closeModal}
+              >
+                Schließen
+              </button>
             </div>
-
-            <button
-              onClick={() => copyPrompt(selectedImage.prompt)}
-              style={{
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                marginRight: '8px'
-              }}
-            >
-              {copySuccess ? '✅ Copied!' : '📋 Copy Prompt'}
-            </button>
-
-            <button
-              onClick={() => openImage(selectedImage.result_image_url)}
-              style={{
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                marginRight: '8px'
-              }}
-            >
-              🔗 Open Full Size
-            </button>
-
-            <button
-              onClick={closeModal}
-              style={{
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer'
-              }}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

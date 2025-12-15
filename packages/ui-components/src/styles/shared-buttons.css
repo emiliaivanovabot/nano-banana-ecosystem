@@ -1,0 +1,247 @@
+/* NANO BANANA BUTTON SYSTEM - NEVER CHANGE THESE COLORS/STYLES! */
+/* Single Source of Truth für alle Buttons im gesamten Ecosystem */
+
+/* BASE BUTTON STYLES */
+.btn-base {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-base:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-base:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* PRIMARY YELLOW BUTTON - FIXED BLACK TEXT */
+.btn-yellow {
+  background: #f59e0b;
+  color: #000000; /* SCHWARZ für bessere Lesbarkeit */
+  font-weight: 600;
+}
+
+.btn-yellow:hover {
+  background: #e5920a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+}
+
+/* SECONDARY PURPLE BUTTON */
+.btn-purple {
+  background: rgb(177, 82, 224);
+  color: white;
+}
+
+.btn-purple:hover {
+  background: rgb(157, 62, 204);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(177, 82, 224, 0.3);
+}
+
+/* NEUTRAL GRAY BUTTON */
+.btn-gray {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-gray:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(108, 117, 125, 0.3);
+}
+
+/* SUCCESS GREEN BUTTON */
+.btn-green {
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-green:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* DANGER RED BUTTON */
+.btn-red {
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-red:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* ERROR BUTTON (ALIAS FOR RED) */
+.btn-error {
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-error:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* BLUE BUTTON */
+.btn-blue {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-blue:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* SECONDARY BUTTON */
+.btn-secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.btn-secondary:hover {
+  background: hsl(var(--accent));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* DISABLED BUTTON */
+.btn-disabled {
+  background: #9ca3af !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-disabled:hover {
+  background: #9ca3af !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* OUTLINE BUTTONS */
+.btn-outline {
+  background: transparent;
+  border: 2px solid #e5e7eb;
+  color: #374151;
+}
+
+.btn-outline:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.btn-outline-yellow {
+  background: transparent;
+  border: 2px solid #f59e0b;
+  color: #f59e0b;
+}
+
+.btn-outline-yellow:hover {
+  background: #f59e0b;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+/* BUTTON SIZES */
+.btn-small {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-xl {
+  padding: 20px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+/* FULL WIDTH BUTTON */
+.btn-full {
+  width: 100%;
+}
+
+/* ICON BUTTONS */
+.btn-icon-only {
+  padding: 12px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+/* DARK MODE SUPPORT */
+@media (prefers-color-scheme: dark) {
+  .btn-yellow {
+    background: #ffc947;
+    color: #000000; /* Bleibt schwarz auch im Dark Mode */
+  }
+
+  .btn-yellow:hover {
+    background: #e6b340;
+    color: #000000;
+  }
+
+  .btn-purple {
+    background: rgb(197, 102, 244);
+  }
+
+  .btn-purple:hover {
+    background: rgb(177, 82, 224);
+  }
+
+  .btn-gray {
+    background: #444;
+    color: #e5e5e5;
+  }
+
+  .btn-gray:hover {
+    background: #555;
+  }
+
+  .btn-outline {
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .btn-outline:hover {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+}

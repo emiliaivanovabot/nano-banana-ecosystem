@@ -1,0 +1,35 @@
+{
+  "name": "@nano-banana/ui-components",
+  "version": "1.0.0",
+  "description": "Shared UI components and design system for nano-banana ecosystem",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run copy:css",
+    "build:ts": "tsc",
+    "copy:css": "cp -r src/styles dist/",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "design-system",
+    "modal",
+    "nano-banana"
+  ],
+  "author": "Nano Banana Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -13,7 +13,8 @@
     "react": "^18",
     "react-dom": "^18",
     "@repo/auth-config": "*",
-    "@repo/database": "*"
+    "@repo/database": "*",
+    "@nano-banana/ui-components": "file:../../packages/ui-components"
   },
   "devDependencies": {
     "@types/node": "^20",

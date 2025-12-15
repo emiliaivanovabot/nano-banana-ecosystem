@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@repo/auth-config'
+import UserInspoGallery from '../components/UserInspoGallery'
+import RecentImagesHistory from '../components/RecentImagesHistory'
 
 export default function NanoBananaPage() {
   // V1 State Management - EXACT REPLICATION
@@ -1559,6 +1561,20 @@ export default function NanoBananaPage() {
             }}>
               🍌 Dein Nano Banana wird generiert...
             </p>
+          </div>
+        )}
+
+        {/* Community Inspiration Gallery - V1 Order */}
+        {userSettings && (
+          <div style={{ marginTop: '24px' }}>
+            <UserInspoGallery currentUser={userSettings} />
+          </div>
+        )}
+
+        {/* User's Recent Images Gallery */}
+        {userSettings && (
+          <div style={{ marginTop: '24px' }}>
+            <RecentImagesHistory currentUser={userSettings} />
           </div>
         )}
 
