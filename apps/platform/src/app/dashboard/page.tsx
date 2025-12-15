@@ -267,7 +267,7 @@ export default function Dashboard() {
                 
                 {/* 1. Guthaben-Übersicht - Kompakt */}
                 <div className="bg-nano-card p-4 shadow-2xl">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="text-lg font-bold text-white mb-1">Verbleibendes Guthaben</h2>
                       <div className="text-2xl font-bold text-emerald-400">{userProfile.credits_remaining} Credits</div>
@@ -282,35 +282,122 @@ export default function Dashboard() {
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* 1.5 Performance - KOMPAKT */}
-                <div className="bg-nano-card p-4 shadow-2xl">
-                  <h3 className="text-lg font-bold text-white mb-2">⚡ Performance</h3>
-                  <div className="grid grid-cols-6 gap-4">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-emerald-400">{userProfile.success_rate}%</div>
-                      <div className="text-xs text-slate-400">Erfolg</div>
+                  
+                  <div className="border-t border-slate-700 pt-3">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">⚡ Performance</h4>
+                    <div className="grid grid-cols-6 gap-4">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-emerald-400">{userProfile.success_rate}%</div>
+                        <div className="text-xs text-slate-400">Erfolg</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-blue-400">{userProfile.avg_generation_time}s</div>
+                        <div className="text-xs text-slate-400">Ø Zeit</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-400">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
+                        <div className="text-xs text-slate-400">Tokens</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-red-400">{userProfile.total_errors}</div>
+                        <div className="text-xs text-slate-400">Errors</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-orange-400">{userProfile.total_credits_used}</div>
+                        <div className="text-xs text-slate-400">Credits</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-pink-400">{userProfile.total_generations}</div>
+                        <div className="text-xs text-slate-400">Media</div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-blue-400">{userProfile.avg_generation_time}s</div>
-                      <div className="text-xs text-slate-400">Ø Zeit</div>
+                  </div>
+                  
+                  <div className="border-t border-slate-700 pt-3 mt-3">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">💰 Ausgaben-Verlauf</h4>
+                    <div className="grid grid-cols-4 gap-2 text-sm">
+                      <div className="text-center">
+                        <div className="text-yellow-400 font-bold">{todayStats?.total_credits_used_today || 0}</div>
+                        <div className="text-slate-400">Heute</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-white font-bold">23</div>
+                        <div className="text-slate-400">Woche</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-emerald-400 font-bold">{userProfile.total_credits_used}</div>
+                        <div className="text-slate-400">Monat</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-slate-300 font-bold">${userProfile?.total_cost_usd?.toFixed(2) || '0.00'}</div>
+                        <div className="text-slate-400">Total</div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-purple-400">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
-                      <div className="text-xs text-slate-400">Tokens</div>
+                  </div>
+                  
+                  <div className="border-t border-slate-700 pt-3 mt-3">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">📐 Formate & Tech Stats</h4>
+                    <div className="space-y-3">
+                      {/* Beliebte Formate */}
+                      <div>
+                        <h5 className="text-xs font-medium text-slate-400 mb-1">Beliebte Formate</h5>
+                        <div className="relative bg-slate-700 h-4 mb-3 flex rounded overflow-hidden shadow-sm">
+                          <div className="bg-yellow-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '45%'}}>
+                            <span className="text-black text-xs font-bold">16:9</span>
+                          </div>
+                          <div className="bg-purple-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '28%'}}>
+                            <span className="text-white text-xs font-bold">1:1</span>
+                          </div>
+                          <div className="bg-emerald-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '18%'}}>
+                            <span className="text-white text-xs font-bold">9:16</span>
+                          </div>
+                          <div className="bg-blue-500 h-4 flex items-center justify-center transition-all hover:brightness-110" style={{width: '9%'}}>
+                            <span className="text-white text-xs font-bold">4:3</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Tech Stats */}
+                      <div>
+                        <h5 className="text-xs font-medium text-slate-400 mb-1">Tech Stats</h5>
+                        <div className="grid grid-cols-4 gap-2 text-xs">
+                          <div className="text-center">
+                            <div className="text-red-400 font-bold">2</div>
+                            <div className="text-slate-400">Fehler</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-blue-400 font-bold">1.2s</div>
+                            <div className="text-slate-400">Ø Zeit</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-purple-400 font-bold">124</div>
+                            <div className="text-slate-400">2K</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-yellow-400 font-bold">43</div>
+                            <div className="text-slate-400">4K</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-red-400">{userProfile.total_errors}</div>
-                      <div className="text-xs text-slate-400">Errors</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-orange-400">{userProfile.total_credits_used}</div>
-                      <div className="text-xs text-slate-400">Credits</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-pink-400">{userProfile.total_generations}</div>
-                      <div className="text-xs text-slate-400">Media</div>
+                  </div>
+                  
+                  <div className="border-t border-slate-700 pt-3 mt-3">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">🔑 API Status</h4>
+                    <div className="flex justify-between items-center text-xs">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-slate-300">Gemini</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-slate-300">Nano-Banana</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span className="text-slate-300">Keys Valid</span>
+                      </div>
+                      <div className="text-slate-400 text-xs">5min ago</div>
                     </div>
                   </div>
                 </div>
@@ -362,7 +449,7 @@ export default function Dashboard() {
                   
                   {/* Premium SVG Chart */}
                   <div className="h-48 w-full">
-                    <svg viewBox="0 0 300 120" className="w-full h-full">
+                    <svg viewBox="0 0 300 120" className="w-full h-full" preserveAspectRatio="none">
                       <defs>
                         <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                           <stop offset="0%" stopColor="rgb(34, 197, 94)" stopOpacity="0.3"/>
@@ -478,7 +565,7 @@ export default function Dashboard() {
                               fill="rgb(34, 197, 94)"
                               stroke="rgb(22, 163, 74)"
                               strokeWidth="0.5"
-                              className="drop-shadow-sm cursor-pointer hover:scale-125 transition-all duration-200"
+                              className="drop-shadow-sm cursor-pointer"
                               style={{
                                 opacity: 0,
                                 animation: `fadeInPoint 0.5s ease-out ${1.5 + i * 0.1}s forwards`
@@ -487,13 +574,29 @@ export default function Dashboard() {
                               onMouseEnter={() => {
                                 // Tooltip anzeigen
                                 const tooltip = document.getElementById(`tooltip-${i}`);
+                                const bg = document.getElementById(`tooltip-bg-${i}`);
                                 if (tooltip) tooltip.style.opacity = '1';
+                                if (bg) bg.style.opacity = '1';
                               }}
                               onMouseLeave={() => {
                                 // Tooltip verstecken
                                 const tooltip = document.getElementById(`tooltip-${i}`);
+                                const bg = document.getElementById(`tooltip-bg-${i}`);
                                 if (tooltip) tooltip.style.opacity = '0';
+                                if (bg) bg.style.opacity = '0';
                               }}
+                            />
+                            {/* Tooltip Background */}
+                            <rect
+                              id={`tooltip-bg-${i}`}
+                              x={x - 8}
+                              y={y - 20}
+                              width="16"
+                              height="14"
+                              rx="2"
+                              fill="rgba(0,0,0,0.8)"
+                              style={{ opacity: 0, transition: 'opacity 0.2s' }}
+                              pointerEvents="none"
                             />
                             {/* Tooltip */}
                             <text
@@ -509,17 +612,6 @@ export default function Dashboard() {
                             >
                               {generations}
                             </text>
-                            {/* Tooltip Background */}
-                            <rect
-                              x={x - 8}
-                              y={y - 20}
-                              width="16"
-                              height="14"
-                              rx="2"
-                              fill="rgba(0,0,0,0.8)"
-                              style={{ opacity: 0, transition: 'opacity 0.2s' }}
-                              pointerEvents="none"
-                            />
                           </g>
                         );
                         });
@@ -545,19 +637,26 @@ export default function Dashboard() {
                     </div>
                   ) : selectedPeriod === 'month' ? (
                     <div className="relative text-xs text-slate-400 mt-1 h-5">
-                      <span className="absolute left-[9%]">3.</span>
-                      <span className="absolute left-[27%]">9.</span>
-                      <span className="absolute left-[45%]">15.</span>
-                      <span className="absolute left-[64%]">21.</span>
-                      <span className="absolute left-[82%]">27.</span>
-                      <span className="absolute -bottom-4 right-0 text-white font-medium">Heute</span>
+                      <span className="absolute left-[10%]">3.</span>
+                      <span className="absolute left-[20%]">6.</span>
+                      <span className="absolute left-[30%]">9.</span>
+                      <span className="absolute left-[40%]">12.</span>
+                      <span className="absolute left-[50%]">15.</span>
+                      <span className="absolute left-[60%]">18.</span>
+                      <span className="absolute left-[70%]">21.</span>
+                      <span className="absolute left-[80%]">24.</span>
+                      <span className="absolute left-[90%]">27.</span>
+                      <span className="absolute left-[100%] -translate-x-full text-emerald-400 font-medium">Heute</span>
                     </div>
                   ) : (
                     <div className="relative text-xs text-slate-400 mt-1 h-5">
                       <span className="absolute left-[14%]">Q1</span>
-                      <span className="absolute left-[43%]">Q2</span>
-                      <span className="absolute left-[72%]">Q3</span>
-                      <span className="absolute -bottom-4 right-0 text-white font-medium">Jetzt</span>
+                      <span className="absolute left-[28%]">Q1 Ende</span>
+                      <span className="absolute left-[42%]">Q2</span>
+                      <span className="absolute left-[57%]">Q2 Ende</span>
+                      <span className="absolute left-[71%]">Q3</span>
+                      <span className="absolute left-[85%]">Q3 Ende</span>
+                      <span className="absolute left-[100%] -translate-x-full text-emerald-400 font-medium">Jetzt</span>
                     </div>
                   )}
                 </div>
@@ -627,6 +726,26 @@ export default function Dashboard() {
                   </div>
                 </div>
 
+              </div>
+
+              {/* Rechte Spalte: Seiten-Bereich (1/4) */}
+              <div className="space-y-6">
+                
+                {/* 5. Beliebteste Features */}
+                <div className="bg-nano-card p-3 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-2">⭐ Beliebteste Programme</h3>
+                  <div className="relative bg-slate-700 h-4 mb-2 flex rounded overflow-hidden shadow-sm">
+                    <div className="bg-yellow-500 h-4 transition-all hover:brightness-110" style={{width: '67%'}}></div>
+                    <div className="bg-blue-500 h-4 transition-all hover:brightness-110" style={{width: '28%'}}></div>
+                    <div className="bg-purple-500 h-4 transition-all hover:brightness-110" style={{width: '5%'}}></div>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-yellow-500 font-bold">Nano-Banana</span>
+                    <span className="text-blue-500 font-bold">Seedream</span>
+                    <span className="text-purple-500 font-bold">WAN</span>
+                  </div>
+                </div>
+
                 {/* 3. Schnelle Aktionen - Kompakt */}
                 <div className="bg-nano-card p-4 shadow-2xl">
                   <h3 className="text-lg font-bold text-white mb-3">Schnelle Aktionen</h3>
@@ -654,129 +773,6 @@ export default function Dashboard() {
                       <span>💡</span>
                       <span>Inspiration</span>
                     </a>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Rechte Spalte: Seiten-Bereich (1/4) */}
-              <div className="space-y-6">
-                
-                {/* 4. Ausgaben-Verlauf */}
-                <div className="bg-nano-card p-4 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-4">💰 Ausgaben-Verlauf</h3>
-                  <div className="space-y-3">
-                    {todayStats && (
-                    <div className="flex justify-between py-2 border-b border-slate-700">
-                      <span className="text-slate-300">Heute:</span>
-                      <span className="text-yellow-400 font-bold">{todayStats.total_credits_used_today} Credits</span>
-                    </div>
-                    )}
-                    <div className="flex justify-between py-2 border-b border-slate-700">
-                      <span className="text-slate-300">Diese Woche:</span>
-                      <span className="text-white font-bold">23 Credits</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-slate-700">
-                      <span className="text-slate-300">Diesen Monat:</span>
-                      <span className="text-emerald-400 font-bold">{userProfile.total_credits_used} Credits</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="text-slate-300">Total USD:</span>
-                      <span className="text-slate-400 font-bold">${userProfile?.total_cost_usd?.toFixed(2) || '0.00'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 6. Most Used Prompts - NEW */}
-                <div className="bg-nano-card p-4 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-4">🎯 Beliebte Prompts</h3>
-                  <div className="space-y-2">
-                    {(userProfile?.most_used_prompts || ['Portrait', 'Landscape', 'Abstract']).map((prompt, index) => (
-                      <div key={index} className="flex justify-between py-1">
-                        <span className="text-slate-300 text-sm">{index + 1}. {prompt}</span>
-                        <span className="text-slate-500 text-xs">{Math.floor(Math.random() * 20 + 5)}x</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 7. API & Status - NEW */}
-                <div className="bg-nano-card p-4 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-4">🔑 API Status</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Gemini API:</span>
-                      <span className="text-green-400 font-bold">✅ Aktiv</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Nano-Banana:</span>
-                      <span className="text-green-400 font-bold">✅ Aktiv</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Key Status:</span>
-                      <span className="text-blue-400 font-bold">Valid</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Last Check:</span>
-                      <span className="text-slate-400 font-bold">vor 5min</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 8. Technical Stats */}
-                <div className="bg-nano-card p-4 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-4">🔧 Tech Stats</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Total Errors:</span>
-                      <span className="text-red-400 font-bold">{userProfile.total_errors}</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">Avg Time:</span>
-                      <span className="text-blue-400 font-bold">{Math.round(userProfile.total_generation_time_seconds / userProfile.total_generations)}s</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">2K Gens:</span>
-                      <span className="text-white font-bold">{userProfile.daily_count_2k_9_16}</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-slate-300 text-sm">4K Gens:</span>
-                      <span className="text-purple-400 font-bold">{userProfile.daily_count_4k_9_16}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. Beliebteste Features */}
-                <div className="bg-nano-card p-4 shadow-xl">
-                  <h3 className="text-lg font-bold text-white mb-4">⭐ Beliebteste Features</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-slate-300 text-sm">🍌 4K Bilder:</span>
-                        <span className="text-white font-bold text-sm">67%</span>
-                      </div>
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '67%' }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-slate-300 text-sm">📹 Video-Gen:</span>
-                        <span className="text-white font-bold text-sm">5%</span>
-                      </div>
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '5%' }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-slate-300 text-sm">🎨 Portraits:</span>
-                        <span className="text-white font-bold text-sm">28%</span>
-                      </div>
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '28%' }}></div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
