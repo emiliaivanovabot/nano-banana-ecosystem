@@ -3,30 +3,30 @@
 
 /* CSS CUSTOM PROPERTIES (CSS Variables) */
 :root {
-  /* LIGHT MODE COLORS */
-  --background: 0 0% 100%;           /* Weiß */
-  --foreground: 222.2 84% 4.9%;      /* Fast Schwarz */
-  --card: 0 0% 100%;                 /* Weiß für Cards */
-  --card-foreground: 222.2 84% 4.9%; /* Text auf Cards */
-  --primary: 221.2 83.2% 53.3%;      /* Blau */
-  --primary-foreground: 210 40% 98%; /* Weiß auf Primary */
-  --secondary: 210 40% 96%;          /* Hellgrau */
-  --secondary-foreground: 222.2 84% 4.9%; /* Dunkel auf Secondary */
-  --muted: 210 40% 96%;              /* Gedämpft */
-  --muted-foreground: 215.4 16.3% 46.9%; /* Gedämpfter Text */
-  --accent: 210 40% 96%;             /* Akzent */
-  --accent-foreground: 222.2 84% 4.9%; /* Text auf Akzent */
-  --destructive: 0 84.2% 60.2%;      /* Rot */
-  --destructive-foreground: 210 40% 98%; /* Weiß auf Rot */
-  --border: 214.3 31.8% 91.4%;       /* Border Grau */
-  --input: 214.3 31.8% 91.4%;        /* Input Border */
-  --ring: 221.2 83.2% 53.3%;         /* Focus Ring */
+  /* DARK MODE COLORS - FORCE DARK THEME */
+  --background: 222.2 84% 4.9%;      /* Dunkel */
+  --foreground: 210 40% 98%;         /* Hell */
+  --card: 222.2 84% 4.9%;           /* Dunkle Cards */
+  --card-foreground: 210 40% 98%;   /* Heller Text */
+  --primary: 47 100% 65%;            /* Nano Banana Gelb */
+  --primary-foreground: 0 0% 0%;     /* Schwarz auf Gelb */
+  --secondary: 280 70% 60%;          /* Nano Banana Lila */
+  --secondary-foreground: 0 0% 100%; /* Weiß auf Lila */
+  --muted: 217.2 32.6% 17.5%;       /* Gedämpft Dunkel */
+  --muted-foreground: 215 20.2% 65.1%; /* Gedämpfter Text */
+  --accent: 217.2 32.6% 17.5%;      /* Dunkel Akzent */
+  --accent-foreground: 210 40% 98%; /* Hell auf Akzent */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;      /* Dunkle Border */
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
   
   /* NANO BANANA SPECIFIC COLORS */
-  --nano-gradient-from: 331 83% 58%;  /* Pink #ec4899 */
-  --nano-gradient-to: 43 100% 51%;    /* Orange #f59e0b */
-  --nano-header-bg: 0 0% 100%;        /* Header Background */
-  --nano-page-bg: 0 0% 100%;          /* Page Background */
+  --nano-gradient-from: 332 81% 71%; /* Helleres Pink */
+  --nano-gradient-to: 43 96% 65%;    /* Helleres Orange */
+  --nano-header-bg: 222.2 84% 4.9%;  /* Dunkler Header */
+  --nano-page-bg: 222.2 84% 4.9%;    /* Dunkle Page */
 }
 
 /* DARK MODE COLORS */

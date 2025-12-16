@@ -157,7 +157,7 @@ export default function Dashboard() {
   const fetchRecentGenerations = async () => {
     try {
       const v1User = user as V1User
-      const response = await fetch(`/api/images/recent?username=${v1User.username}&limit=8`)
+      const response = await fetch(`/api/images/recent?username=${v1User.username}&limit=13`)
       if (response.ok) {
         const data = await response.json()
         setRecentGenerations(data.images || [])
@@ -261,22 +261,22 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="container-nano py-8">
+        <main className="container-nano py-4 lg:py-8 max-w-7xl mx-auto">
           
           {/* HAUPT-BEREICH: Guthaben-Übersicht */}
           {userProfile && (
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 mb-6 lg:mb-12">
               
-              {/* Linke Spalte: Haupt-Bereich (3/4) */}
-              <div className="xl:col-span-3 space-y-6">
+              {/* Linke Spalte: Haupt-Bereich */}
+              <div className="lg:col-span-12 space-y-4 lg:space-y-8">
                 
                 {/* 0. Favoriten - Kompakt */}
-                <div className="bg-nano-card p-3 shadow-xl">
-                  <h3 className="text-sm font-bold text-white mb-2">⭐ Favoriten</h3>
-                  <div className="flex gap-1">
+                <div className="bg-nano-card p-4 lg:p-6 shadow-xl">
+                  <h3 className="text-sm lg:text-base font-bold text-white mb-3 lg:mb-4">⭐ Favoriten</h3>
+                  <div className="flex gap-2 lg:gap-4">
                     <a
-                      href="/generation-modes"
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                      href="/nano-banana"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 lg:px-6 py-2 lg:py-3 rounded transition-colors text-xs lg:text-sm font-medium flex-1 text-center"
                     >
                       Nano-Banana
                     </a>
@@ -284,19 +284,21 @@ export default function Dashboard() {
                       href="http://localhost:3001"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-3 lg:px-6 py-2 lg:py-3 rounded transition-colors text-xs lg:text-sm font-medium flex-1 text-center"
                     >
                       WAN 2.5
                     </a>
                     <a
                       href="/inspiration"
-                      className="bg-slate-600 hover:bg-slate-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                      className="bg-slate-600 hover:bg-slate-700 text-white px-3 lg:px-6 py-2 lg:py-3 rounded transition-colors text-xs lg:text-sm font-medium flex-1 text-center"
                     >
                       Grok Prompts
                     </a>
                     <a
-                      href="/generation-modes"
-                      className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors text-xs font-medium flex-1 text-center"
+                      href="http://localhost:3001"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 lg:px-6 py-2 lg:py-3 rounded transition-colors text-xs lg:text-sm font-medium flex-1 text-center"
                     >
                       Seedream
                     </a>
@@ -304,26 +306,26 @@ export default function Dashboard() {
                 </div>
                 
                 {/* 1. Guthaben-Übersicht - Kompakt */}
-                <div className="bg-nano-card p-4 shadow-2xl">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="bg-nano-card p-4 lg:p-8 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6 lg:mb-8">
                     <div>
-                      <h2 className="text-lg font-bold text-white mb-1">Verbleibendes Guthaben</h2>
-                      <div className="text-2xl font-bold text-emerald-400">{userProfile.credits_remaining} Credits</div>
-                      <p className="text-sm text-slate-300">(≈{Math.round(userProfile.credits_remaining * 0.33)}€)</p>
+                      <h2 className="text-lg lg:text-2xl font-bold text-white mb-2 lg:mb-3">Verbleibendes Guthaben</h2>
+                      <div className="text-2xl lg:text-4xl font-bold text-emerald-400">{userProfile.credits_remaining} Credits</div>
+                      <p className="text-sm lg:text-base text-slate-300">(≈{Math.round(userProfile.credits_remaining * 0.33)}€)</p>
                     </div>
                     {todayStats && (
                       <div className="text-right">
-                        <p className="text-sm text-slate-400">Heute verbraucht:</p>
-                        <p className="text-lg font-bold text-yellow-400">{todayStats.total_credits_used_today} Credits</p>
-                        <p className="text-xs text-slate-500">{todayStats.nano_banana_count + todayStats.seedream_count} Bilder, {todayStats.wan_video_count} Videos</p>
-                        <p className="text-xs text-slate-500 mt-1">Last Login: vor 6 Stunden</p>
+                        <p className="text-sm lg:text-base text-slate-400">Heute verbraucht:</p>
+                        <p className="text-lg lg:text-2xl font-bold text-yellow-400">{todayStats.total_credits_used_today} Credits</p>
+                        <p className="text-xs lg:text-sm text-slate-500">{todayStats.nano_banana_count + todayStats.seedream_count} Bilder, {todayStats.wan_video_count} Videos</p>
+                        <p className="text-xs lg:text-sm text-slate-500 mt-1">Last Login: vor 6 Stunden</p>
                       </div>
                     )}
                   </div>
                   
-                  <div className="border-t border-slate-700 pt-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-slate-300">⚡ Performance</h4>
+                  <div className="border-t border-slate-700 pt-4 lg:pt-6">
+                    <div className="flex items-center justify-between mb-3 lg:mb-4">
+                      <h4 className="text-sm lg:text-base font-medium text-slate-300">⚡ Performance</h4>
                       <button
                         onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
                         className="text-xs text-slate-400 hover:text-slate-300 transition-colors flex items-center gap-1"
@@ -339,30 +341,30 @@ export default function Dashboard() {
                         </svg>
                       </button>
                     </div>
-                    <div className="grid grid-cols-6 gap-4">
+                    <div className="grid grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-8">
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{userProfile.success_rate}%</div>
-                        <div className="text-xs text-slate-400">Erfolg</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{userProfile.success_rate}%</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Erfolg</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{userProfile.avg_generation_time}s</div>
-                        <div className="text-xs text-slate-400">Ø Zeit</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{userProfile.avg_generation_time}s</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Ø Zeit</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
-                        <div className="text-xs text-slate-400">Tokens</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{Math.round(userProfile.total_prompt_tokens/1000)}k</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Tokens</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{userProfile.total_errors}</div>
-                        <div className="text-xs text-slate-400">Errors</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{userProfile.total_errors}</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Errors</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{userProfile.total_credits_used}</div>
-                        <div className="text-xs text-slate-400">Credits</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{userProfile.total_credits_used}</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Credits</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-white">{userProfile.total_generations}</div>
-                        <div className="text-xs text-slate-400">Media</div>
+                        <div className="text-base lg:text-xl font-bold text-white">{userProfile.total_generations}</div>
+                        <div className="text-xs lg:text-sm text-slate-400">Media</div>
                       </div>
                     </div>
                   </div>
@@ -733,99 +735,28 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* 2. Letzte Aktivität */}
-                <div className="bg-nano-card p-4 shadow-2xl">
-                  <h3 className="text-lg font-bold text-white mb-3">Letzte Aktivität</h3>
-                  <div className="space-y-3">
-                    {!user ? (
-                      <div className="text-center text-slate-400">Bitte einloggen um Bilder zu sehen.</div>
-                    ) : recentGenerations === null ? (
-                      <div className="text-center text-slate-400">Lade Bilder...</div>
-                    ) : recentGenerations.length === 0 ? (
-                      <div className="text-center text-slate-400">Noch keine Bilder generiert.</div>
-                    ) : (
-                      <div className="flex gap-2 overflow-x-auto pb-2" style={{
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: '#ccc transparent'
-                      }}>
-                        {recentGenerations.map((generation, index) => (
-                          <img
-                            key={generation.id}
-                            src={generation.result_image_url}
-                            className="w-20 h-20 object-cover rounded-lg cursor-pointer transition-all duration-200 flex-shrink-0 border-2 border-transparent hover:scale-105 hover:border-blue-500 shadow-sm hover:shadow-md"
-                            onClick={() => {
-                              setSelectedImage({
-                                id: generation.id,
-                                result_image_url: generation.result_image_url,
-                                prompt: generation.prompt,
-                                created_at: generation.created_at,
-                                generation_type: generation.generation_type,
-                                username: generation.username
-                              })
-                            }}
-                            loading="lazy"
-                            alt={`Generated image from ${generation.created_at}`}
-                            title={`${generation.generation_type} - ${new Date(generation.created_at).toLocaleDateString()}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    
-                    {todayStats && (
-                    <div className="grid grid-cols-3 gap-4 text-center border-t border-slate-700 pt-3">
-                      <div>
-                        <div className="text-lg font-bold text-emerald-400">{userProfile?.total_generations || 156}</div>
-                        <div className="text-xs text-slate-400">Bilder gesamt</div>
-                        <div className="flex flex-col gap-1 mt-1">
-                          <span className="text-xs bg-yellow-600/30 text-yellow-300 px-2 py-0.5 rounded">nano-banana</span>
-                          <span className="text-xs bg-purple-600/30 text-purple-300 px-2 py-0.5 rounded">seedream</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-blue-400">{todayStats.wan_video_count || 1}</div>
-                        <div className="text-xs text-slate-400">Videos gesamt</div>
-                        <div className="flex flex-col gap-1 mt-1">
-                          <span className="text-xs bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">wan2.5</span>
-                          <span className="text-xs bg-gray-600/30 text-gray-300 px-2 py-0.5 rounded">grok</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-purple-400">{(userProfile?.total_generations || 156) + (todayStats.wan_video_count || 1)}</div>
-                        <div className="text-xs text-slate-400">Media gesamt</div>
-                      </div>
-                    </div>
-                    )}
-                  </div>
-                </div>
 
               </div>
 
-              {/* Rechte Spalte: Seiten-Bereich (1/4) */}
-              <div className="space-y-6">
-                
-              </div>
               
             </div>
           )}
 
           {/* Apps Grid */}
-          <div className="grid-nano-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow">
-              <div className="p-8">
+              <div className="p-6 lg:p-8">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">🍌</span>
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg lg:text-xl font-bold">🍌</span>
                   </div>
-                  <h3 className="ml-3 text-title">Nano Banana</h3>
+                  <h3 className="ml-3 text-lg lg:text-xl font-bold text-white">Nano Banana</h3>
                 </div>
-                <p className="mt-2 text-body-small text-muted">
-                  AI image generation suite with 5 specialized modules
-                </p>
-                <div className="mt-4">
+                <div className="mt-4 lg:mt-6">
                   <div className="flex gap-2">
                     <a
-                      href="/generation-modes"
-                      className="btn-base btn-yellow"
+                      href="/nano-banana"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 lg:px-6 lg:py-3 rounded transition-colors text-sm lg:text-base font-medium w-full text-center"
                     >
                       Launch Nano Banana
                     </a>
@@ -835,22 +766,19 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow">
-              <div className="p-8">
+              <div className="p-6 lg:p-8">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">S</span>
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg lg:text-xl font-bold">S</span>
                   </div>
-                  <h3 className="ml-3 text-title">Seedream</h3>
+                  <h3 className="ml-3 text-lg lg:text-xl font-bold text-white">Seedream</h3>
                 </div>
-                <p className="mt-2 text-body-small text-muted">
-                  AI-powered image generation with face-based personalization
-                </p>
-                <div className="mt-4">
+                <div className="mt-4 lg:mt-6">
                   <a
                     href="http://localhost:3001"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-base btn-purple"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 lg:px-6 lg:py-3 rounded transition-colors text-sm lg:text-base font-medium w-full text-center block"
                   >
                     Launch Seedream
                   </a>
@@ -859,20 +787,17 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow opacity-50">
-              <div className="p-6">
+              <div className="p-6 lg:p-8">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">V</span>
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg lg:text-xl font-bold">V</span>
                   </div>
-                  <h3 className="ml-3 text-title">Video Generator</h3>
+                  <h3 className="ml-3 text-lg lg:text-xl font-bold text-white">Video Generator</h3>
                 </div>
-                <p className="mt-2 text-body-small text-muted">
-                  Create stunning AI videos from images and prompts
-                </p>
-                <div className="mt-4">
+                <div className="mt-4 lg:mt-6">
                   <button
                     disabled
-                    className="btn-base btn-disabled"
+                    className="bg-slate-600 text-slate-400 px-4 py-2 lg:px-6 lg:py-3 rounded text-sm lg:text-base font-medium w-full cursor-not-allowed"
                   >
                     Coming Soon
                   </button>
@@ -881,20 +806,17 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-nano-card shadow-nano hover:shadow-nano-md transition-shadow opacity-50">
-              <div className="p-6">
+              <div className="p-6 lg:p-8">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">C</span>
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg lg:text-xl font-bold">C</span>
                   </div>
-                  <h3 className="ml-3 text-title">Chat Assistant</h3>
+                  <h3 className="ml-3 text-lg lg:text-xl font-bold text-white">Chat Assistant</h3>
                 </div>
-                <p className="mt-2 text-body-small text-muted">
-                  AI-powered conversations and content creation
-                </p>
-                <div className="mt-4">
+                <div className="mt-4 lg:mt-6">
                   <button
                     disabled
-                    className="btn-base btn-disabled"
+                    className="bg-slate-600 text-slate-400 px-4 py-2 lg:px-6 lg:py-3 rounded text-sm lg:text-base font-medium w-full cursor-not-allowed"
                   >
                     Coming Soon
                   </button>

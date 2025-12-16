@@ -13,29 +13,33 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* DARK MODE COLORS */
-    --background: 222.2 84% 4.9%;      /* Dunkel */
-    --foreground: 210 40% 98%;         /* Hell */
-    --card: 222.2 84% 4.9%;           /* Dunkle Cards */
-    --card-foreground: 210 40% 98%;   /* Heller Text */
-    --border: 217.2 32.6% 17.5%;      /* Dunkle Border */
-    --primary: 217.2 91.2% 59.8%;     /* Hellblau */
-    --primary-foreground: 222.2 84% 4.9%; /* Dunkel auf Primary */
-    --secondary: 217.2 32.6% 17.5%;   /* Dunkelgrau */
-    --secondary-foreground: 210 40% 98%; /* Hell auf Secondary */
-    --muted: 217.2 32.6% 17.5%;       /* Gedämpft Dunkel */
-    --muted-foreground: 215 20.2% 65.1%; /* Gedämpfter Text */
-    --accent: 217.2 32.6% 17.5%;      /* Dunkel Akzent */
-    --accent-foreground: 210 40% 98%; /* Hell auf Akzent */
-    
-    /* NANO BANANA DARK MODE */
-    --nano-gradient-from: 332 81% 71%; /* Helleres Pink */
-    --nano-gradient-to: 43 96% 65%;    /* Helleres Orange */
-    --nano-header-bg: 222.2 84% 4.9%;  /* Dunkler Header */
-    --nano-page-bg: 222.2 84% 4.9%;    /* Dunkle Page */
-  }
+/* FORCE DARK MODE - Always use dark colors */
+:root {
+  /* DARK MODE COLORS */
+  --background: 222.2 84% 4.9%;      /* Dunkel */
+  --foreground: 210 40% 98%;         /* Hell */
+  --card: 222.2 84% 4.9%;           /* Dunkle Cards */
+  --card-foreground: 210 40% 98%;   /* Heller Text */
+  --border: 217.2 32.6% 17.5%;      /* Dunkle Border */
+  --primary: 47 100% 65%;            /* Nano Banana Gelb */
+  --primary-foreground: 0 0% 0%;     /* Schwarz auf Gelb */
+  --secondary: 280 70% 60%;          /* Nano Banana Lila */
+  --secondary-foreground: 0 0% 100%; /* Weiß auf Lila */
+  --muted: 217.2 32.6% 17.5%;       /* Gedämpft Dunkel */
+  --muted-foreground: 215 20.2% 65.1%; /* Gedämpfter Text */
+  --accent: 217.2 32.6% 17.5%;      /* Dunkel Akzent */
+  --accent-foreground: 210 40% 98%; /* Hell auf Akzent */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+  --radius: 0.5rem;
+  
+  /* NANO BANANA DARK MODE */
+  --nano-gradient-from: 332 81% 71%; /* Helleres Pink */
+  --nano-gradient-to: 43 96% 65%;    /* Helleres Orange */
+  --nano-header-bg: 222.2 84% 4.9%;  /* Dunkler Header */
+  --nano-page-bg: 222.2 84% 4.9%;    /* Dunkle Page */
 }
 
 body {
