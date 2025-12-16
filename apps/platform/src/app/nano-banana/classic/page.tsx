@@ -585,7 +585,7 @@ export default function NanoBananaPage() {
         }
         
         // API Format (wie in handleGenerate)
-        const parts = [
+        const parts: any[] = [
           { text: finalPrompt }
         ]
         
@@ -785,7 +785,7 @@ export default function NanoBananaPage() {
         }
         
         // ECHTE Nano Banana Pro API Format (wie in generateImage)
-        const parts = [
+        const parts: any[] = [
           { text: finalPrompt }
         ]
         
