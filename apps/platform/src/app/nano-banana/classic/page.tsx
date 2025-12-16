@@ -551,7 +551,7 @@ export default function NanoBananaPage() {
 
     // Live Timer für 4x Generierung
     const timerInterval = setInterval(() => {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+      const elapsed = parseFloat(((Date.now() - startTime) / 1000).toFixed(1))
       setMultiTimer(elapsed)
     }, 100)
 
@@ -751,7 +751,7 @@ export default function NanoBananaPage() {
 
     // Live Timer für 10x Generierung
     const timerInterval = setInterval(() => {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+      const elapsed = parseFloat(((Date.now() - startTime) / 1000).toFixed(1))
       setMultiTimer10(elapsed)
     }, 100)
 
